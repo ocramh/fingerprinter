@@ -1,99 +1,111 @@
-package main
+package compare
 
-import (
-	"flag"
-	"fmt"
-	"github.com/go-fingerprint/fingerprint"
-	"github.com/go-fingerprint/gochroma"
-	"image/png"
-	"log"
-	"os"
-	"path/filepath"
-)
+// import (
+// 	"flag"
+// 	"fmt"
+// 	"image/png"
+// 	"log"
+// 	"os"
+// 	"path/filepath"
 
-var (
-	file1, file2 string
-)
+// 	"github.com/go-fingerprint/fingerprint"
+// 	"github.com/go-fingerprint/gochroma"
+// )
 
-func main() {
-	flag.Parse()
+// var (
+// 	file1, file2 string
+// )
 
-	if flag.NArg() < 2 {
-		println("Usage: compare <file1> <file2>")
-		os.Exit(0)
-	}
+// func main() {
+// 	flag.Parse()
 
-	f1, err := os.Open(flag.Arg(0))
+// 	if flag.NArg() < 2 {
+// 		println("Usage: compare <file1> <file2>")
+// 		os.Exit(0)
+// 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	f1, err := os.Open(flag.Arg(0))
 
-	f2, err := os.Open(flag.Arg(1))
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	f2, err := os.Open(flag.Arg(1))
 
-	// Create new fingerprint calculator
-	fpcalc := gochroma.New(gochroma.AlgorithmDefault)
-	defer fpcalc.Close()
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	// Get fingerprints as a slices of 32-bit integers
-	fprint1, err := fpcalc.RawFingerprint(
-		fingerprint.RawInfo{
-			Src:        f1,
-			Channels:   2,
-			Rate:       44100,
-			MaxSeconds: 120,
-		})
+// 	// Create new fingerprint calculator
+// 	fpcalc := gochroma.New(gochroma.AlgorithmDefault)
+// 	defer fpcalc.Close()
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	// Get fingerprints as a slices of 32-bit integers
+// 	fprint1, err := fpcalc.RawFingerprint(
+// 		fingerprint.RawInfo{
+// 			Src:        f1,
+// 			Channels:   2,
+// 			Rate:       44100,
+// 			MaxSeconds: 120,
+// 		})
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	fprint2, err := fpcalc.RawFingerprint(
-		fingerprint.RawInfo{
-			Src:        f2,
-			Channels:   2,
-			Rate:       44100,
-			MaxSeconds: 120,
-		})
+// 	fprintStr, err := fpcalc.Fingerprint(
+// 		fingerprint.RawInfo{
+// 			Src:        f1,
+// 			Channels:   2,
+// 			Rate:       44100,
+// 			MaxSeconds: 322,
+// 		})
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	log.Println("file fingerprint is: ", fprintStr)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	fprint2, err := fpcalc.RawFingerprint(
+// 		fingerprint.RawInfo{
+// 			Src:        f2,
+// 			Channels:   2,
+// 			Rate:       44100,
+// 			MaxSeconds: 322,
+// 		})
 
-	// Compare fingerprints
-	s, err := fingerprint.Compare(fprint1, fprint2)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	// Compare fingerprints
+// 	s, err := fingerprint.Compare(fprint1, fprint2)
 
-	fmt.Printf("Score: %v\n", s)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if s > 0.95 {
-		fmt.Println("Fingerprints do not differ a lot, maybe it's one track")
-	} else {
-		fmt.Println(`Fingerprints differ a lot, it's definitely different
-			records`)
-	}
+// 	fmt.Printf("Score: %v\n", s)
 
-	// Get graphical representation of distance between fingerprints
-	i, err := fingerprint.ImageDistance(fprint1, fprint2)
+// 	if s > 0.95 {
+// 		fmt.Println("Fingerprints do not differ a lot, maybe it's one track")
+// 	} else {
+// 		fmt.Println(`Fingerprints differ a lot, it's definitely different
+// 			records`)
+// 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	// Get graphical representation of distance between fingerprints
+// 	i, err := fingerprint.ImageDistance(fprint1, fprint2)
 
-	out, err := os.Create(filepath.Join(filepath.Dir(flag.Arg(0)), "out.png"))
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	out, err := os.Create(filepath.Join(filepath.Dir(flag.Arg(0)), "out.png"))
 
-	if err := png.Encode(out, i); err != nil {
-		log.Fatal(nil)
-	}
-}
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	if err := png.Encode(out, i); err != nil {
+// 		log.Fatal(nil)
+// 	}
+// }

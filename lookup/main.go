@@ -1,138 +1,141 @@
-package main
+package lookup
 
-import (
-	"encoding/json"
-	"errors"
-	"flag"
-	"fmt"
-	"github.com/go-fingerprint/fingerprint"
-	"github.com/go-fingerprint/gochroma"
-	"github.com/xlab/api"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"net/url"
-	"os"
-	"strconv"
-)
+// import (
+// 	"encoding/json"
+// 	"errors"
+// 	"flag"
+// 	"fmt"
+// 	"io/ioutil"
+// 	"log"
+// 	"net/http"
+// 	"net/url"
+// 	"os"
+// 	"strconv"
 
-const (
-	testApiKey = "8XaBELgH"
-)
+// 	"github.com/go-fingerprint/fingerprint"
+// 	"github.com/go-fingerprint/gochroma"
+// 	"github.com/xlab/api"
+// )
 
-var (
-	duration int
-)
+// const (
+// 	testApiKey = "S5pMOkfMeW"
+// )
 
-func init() {
-	flag.IntVar(&duration, "d", 179, `duration of input audio stream
-		in seconds`)
-}
+// var (
+// 	duration int
+// )
 
-func main() {
-	flag.Parse()
+// func init() {
+// 	flag.IntVar(&duration, "d", 180, `duration of input audio stream
+// 		in seconds`)
+// }
 
-	if flag.NArg() < 1 {
-		println("Usage: lookup [-d=duration] <file>")
-		os.Exit(0)
-	}
+// func main() {
+// 	flag.Parse()
 
-	// Create new fingerprint calculator
-	fpcalc := gochroma.New(gochroma.AlgorithmDefault)
-	defer fpcalc.Close()
+// 	if flag.NArg() < 1 {
+// 		println("Usage: lookup [-d=duration] <file>")
+// 		os.Exit(0)
+// 	}
 
-	f, err := os.Open(flag.Arg(0))
+// 	// Create new fingerprint calculator
+// 	fpcalc := gochroma.New(gochroma.AlgorithmDefault)
+// 	defer fpcalc.Close()
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	f, err := os.Open(flag.Arg(0))
 
-	// Get fingerprint as base64-encoded string
-	fprint, err := fpcalc.Fingerprint(
-		fingerprint.RawInfo{
-			Src:        f,
-			Channels:   2,
-			Rate:       44100,
-			MaxSeconds: 120,
-		})
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	// Get fingerprint as base64-encoded string
+// 	fprint, err := fpcalc.Fingerprint(
+// 		fingerprint.RawInfo{
+// 			Src:        f,
+// 			Channels:   2,
+// 			Rate:       44100,
+// 			MaxSeconds: 180,
+// 		})
 
-	// Determine if our fingerprint corresponds to any song in AcoustId
-	// database
-	i, err := lookupSong(fprint, testApiKey, duration)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+// 	log.Println("file fingerprint is: ", fprint)
 
-	fmt.Println(i)
-}
+// 	// Determine if our fingerprint corresponds to any song in AcoustId
+// 	// database
+// 	i, err := lookupSong(fprint, testApiKey, duration)
 
-func lookupSong(fprint, apikey string, duration int) (i *songInfo, err error) {
-	svc, err := api.New("http://api.acoustid.org/v2")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	if err != nil {
-		return
-	}
+// 	fmt.Println(i)
+// }
 
-	v := url.Values{}
+// func lookupSong(fprint, apikey string, duration int) (i *songInfo, err error) {
+// 	svc, err := api.New("http://api.acoustid.org/v2")
 
-	v.Set("client", apikey)
-	v.Set("fingerprint", fprint)
-	v.Set("duration", strconv.Itoa(duration))
-	v.Set("meta", "recordings releasegroups compress")
+// 	if err != nil {
+// 		return
+// 	}
 
-	req, _ := svc.Request(api.GET, "/lookup", v)
+// 	v := url.Values{}
 
-	var cli http.Client
+// 	v.Set("client", apikey)
+// 	v.Set("fingerprint", "d54bc360-e1b9-4e55-a3e8-b887658a1c4a")
+// 	v.Set("duration", strconv.Itoa(duration))
+// 	v.Set("meta", "recordings releasegroups compress")
 
-	resp, err := cli.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+// 	req, _ := svc.Request(api.GET, "/lookup", v)
 
-	var m struct {
-		Results []struct {
-			Recordings []struct {
-				Duration      int
-				Releasegroups []struct {
-					Title string
-				}
-				Title   string
-				Artists []struct {
-					Name string
-				}
-			}
-		}
-	}
+// 	var cli http.Client
 
-	if err := json.Unmarshal(body, &m); err != nil {
-		return nil, err
-	}
+// 	resp, err := cli.Do(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer resp.Body.Close()
+// 	body, _ := ioutil.ReadAll(resp.Body)
 
-	if len(m.Results) == 0 {
-		return nil, errors.New("No results found")
-	}
+// 	var m struct {
+// 		Results []struct {
+// 			Recordings []struct {
+// 				Duration      int
+// 				Releasegroups []struct {
+// 					Title string
+// 				}
+// 				Title   string
+// 				Artists []struct {
+// 					Name string
+// 				}
+// 			}
+// 		}
+// 	}
 
-	return &songInfo{
-		m.Results[0].Recordings[0].Title,
-		m.Results[0].Recordings[0].Artists[0].Name,
-		m.Results[0].Recordings[0].Releasegroups[0].Title,
-	}, nil
-}
+// 	if err := json.Unmarshal(body, &m); err != nil {
+// 		return nil, err
+// 	}
 
-type songInfo struct {
-	Name   string
-	Artist string
-	Album  string
-}
+// 	if len(m.Results) == 0 {
+// 		return nil, errors.New("No results found")
+// 	}
 
-func (s *songInfo) String() string {
-	return fmt.Sprintf("Track:\t%v\nArtist:\t%v\nAlbum:\t%v", s.Name, s.Artist,
-		s.Album)
-}
+// 	return &songInfo{
+// 		m.Results[0].Recordings[0].Title,
+// 		m.Results[0].Recordings[0].Artists[0].Name,
+// 		m.Results[0].Recordings[0].Releasegroups[0].Title,
+// 	}, nil
+// }
+
+// type songInfo struct {
+// 	Name   string
+// 	Artist string
+// 	Album  string
+// }
+
+// func (s *songInfo) String() string {
+// 	return fmt.Sprintf("Track:\t%v\nArtist:\t%v\nAlbum:\t%v", s.Name, s.Artist,
+// 		s.Album)
+// }
