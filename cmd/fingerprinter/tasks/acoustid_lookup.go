@@ -17,12 +17,12 @@ var (
 
 func init() {
 	rootCmd.AddCommand(acoustidCmd)
-	fpCmd.Flags().StringVarP(&fingerprint, "fingerp", "f", "", "audio fingerprint")
-	fpCmd.Flags().Float32VarP(&duration, "duration", "d", 0, "audio duration")
-	fpCmd.Flags().StringVarP(&apikey, "apikey", "k", "", "acustid key")
-	fpCmd.MarkFlagRequired("fingerp")
-	fpCmd.MarkFlagRequired("duration")
-	fpCmd.MarkFlagRequired("apikey")
+	acoustidCmd.Flags().StringVarP(&fingerprint, "fingerp", "f", "", "audio fingerprint")
+	acoustidCmd.Flags().Float32VarP(&duration, "duration", "d", 0, "audio duration")
+	acoustidCmd.Flags().StringVarP(&apikey, "apikey", "k", "", "acustid key")
+	acoustidCmd.MarkFlagRequired("fingerp")
+	acoustidCmd.MarkFlagRequired("duration")
+	acoustidCmd.MarkFlagRequired("apikey")
 }
 
 var acoustidCmd = &cobra.Command{

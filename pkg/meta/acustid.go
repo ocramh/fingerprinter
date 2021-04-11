@@ -2,6 +2,7 @@ package meta
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -41,13 +42,13 @@ func NewAcoustIDClient(k string) *AcoustIDClient {
 // fingerprint database and return the corresponding track ID and MusicBrainz
 // recording ID if a match was found
 func (a *AcoustIDClient) LookupFingerprint(f *fp.Fingerprint) (*AcoustIDLookupResp, error) {
-
 	encodedPayload := a.buildLookupQueryVals(f).Encode()
 	req, err := http.NewRequest("POST", AcoustIDBaseURL, strings.NewReader(encodedPayload))
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Content-Encoding", "gzip")
+
+	// req.Header.Add("Content-Encoding", "gzip")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	httpClient := &http.Client{
@@ -64,6 +65,7 @@ func (a *AcoustIDClient) LookupFingerprint(f *fp.Fingerprint) (*AcoustIDLookupRe
 		return nil, handleErrResp(resp)
 	}
 
+	log.Println(4)
 	var lookupResp AcoustIDLookupResp
 	err = json.NewDecoder(resp.Body).Decode(&lookupResp)
 	if err != nil {

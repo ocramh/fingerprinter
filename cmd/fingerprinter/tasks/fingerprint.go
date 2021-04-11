@@ -14,7 +14,7 @@ var (
 
 func init() {
 	rootCmd.AddCommand(fpCmd)
-	fpCmd.Flags().StringVarP(&inputFile, "audiofile", "f", "", "audio file path")
+	fpCmd.Flags().StringVarP(&inputFile, "audiofile", "a", "", "audio file path")
 	fpCmd.MarkFlagRequired("audiofile")
 }
 
