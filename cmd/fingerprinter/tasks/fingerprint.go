@@ -14,7 +14,7 @@ var (
 
 func init() {
 	rootCmd.AddCommand(fpCmd)
-	fpCmd.Flags().StringVarP(&inputFile, "audiofile", "f", "", "audio file path")
+	fpCmd.Flags().StringVarP(&inputFile, "audiofile", "a", "", "path to input audio file or directory")
 	fpCmd.MarkFlagRequired("audiofile")
 }
 
@@ -23,11 +23,14 @@ var fpCmd = &cobra.Command{
 	Short: "calculates the fingerprint of the input audio file",
 	Run: func(cmd *cobra.Command, args []string) {
 		chroma := fp.ChromaIO{}
-		calc, err := chroma.CalcFingerprint(inputFile)
+		fingerprints, err := chroma.CalcFingerprint(inputFile)
 		if err != nil {
 			panic(err)
 		}
 
-		log.Println(calc)
+		for _, fingerprint := range fingerprints {
+			log.Printf("[duration] %f\n", fingerprint.Duration)
+			log.Printf("[fingerprint] %f\n", fingerprint.Value)
+		}
 	},
 }

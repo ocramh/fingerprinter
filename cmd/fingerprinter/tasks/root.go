@@ -8,7 +8,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "fingprint",
+	Use:   "fingerprinter",
 	Short: "audio files fingerprinting and metadata fetcher",
 }
 
