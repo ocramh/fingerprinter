@@ -12,7 +12,7 @@ The provided Dockerfile comes with Chromaprint installed.
 
 ## Usage
 Fingerprinter exposes a simple CLI interface to use for interacting with the binary.
-To see the availbale commands run
+To see the available commands run
 ```
 figerprinter --help
 ```

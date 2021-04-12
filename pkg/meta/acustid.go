@@ -92,8 +92,6 @@ func handleErrResp(resp *http.Response) error {
 		return err
 	}
 
-	log.Println(errResp)
-
 	return HTTPError{
 		code:    errResp.Error.Code,
 		message: errResp.Error.Message,

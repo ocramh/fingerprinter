@@ -16,7 +16,7 @@ var (
 
 func init() {
 	rootCmd.AddCommand(acoustidCmd)
-	acoustidCmd.Flags().StringVarP(&apikey, "apikey", "k", "", "acustid key")
+	acoustidCmd.Flags().StringVarP(&apikey, "apikey", "k", "", "acoustid key")
 	acoustidCmd.Flags().StringVarP(&inputFile, "audiofile", "a", "", "audio file path")
 	acoustidCmd.MarkFlagRequired("apikey")
 	acoustidCmd.MarkFlagRequired("audiofile")
@@ -43,7 +43,7 @@ var acoustidCmd = &cobra.Command{
 			log.Printf("[status] %s \n", resp.Status)
 			for _, r := range resp.Results {
 				log.Printf("[score] %f \n", r.Score)
-				log.Printf("[acustid] %s \n", r.ID)
+				log.Printf("[acoustid] %s \n", r.ID)
 
 				for _, recording := range r.Recordings {
 					log.Printf("[mb recording ID] %s \n", recording.MBRecordingsID)
