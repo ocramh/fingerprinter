@@ -3,8 +3,10 @@ package fingerprint
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 )
 
@@ -24,8 +26,9 @@ type Fingerprint struct {
 	Value    string  `json:"fingerprint"`
 }
 
-// CalcFingerprint returns the audio Fingerprint of the file at fPath
-func (c ChromaIO) CalcFingerprint(fPath string) (*Fingerprint, error) {
+// CalcFingerprint returns the audio Fingerprint of the file at fPath.
+// fPath can be a path to a directory or to a single file
+func (c ChromaIO) CalcFingerprint(fPath string) ([]*Fingerprint, error) {
 	fInfo, err := os.Stat(fPath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -36,14 +39,46 @@ func (c ChromaIO) CalcFingerprint(fPath string) (*Fingerprint, error) {
 	}
 
 	if fInfo.IsDir() {
-		return nil, ErrInvalidFileInput
+		return scanAudioDir(fPath)
 	}
 
 	if !isValidExtension(filepath.Ext(fInfo.Name())) {
 		return nil, ErrInvalidFormat
 	}
 
-	cmd := exec.Command("fpcalc", "-json", fPath)
+	fing, err := execFPcalc(fPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return []*Fingerprint{fing}, nil
+}
+
+func scanAudioDir(dirPath string) ([]*Fingerprint, error) {
+	files, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	var fings []*Fingerprint
+	for _, f := range files {
+		if f.IsDir() || !isValidExtension(filepath.Ext(f.Name())) {
+			continue
+		}
+
+		fing, err := execFPcalc(path.Join(dirPath, f.Name()))
+		if err != nil {
+			return nil, err
+		}
+
+		fings = append(fings, fing)
+	}
+
+	return fings, nil
+}
+
+func execFPcalc(filePath string) (*Fingerprint, error) {
+	cmd := exec.Command("fpcalc", "-json", filePath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err

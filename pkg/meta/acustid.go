@@ -2,6 +2,7 @@ package meta
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -67,6 +68,7 @@ func (a *AcoustIDClient) LookupFingerprint(f *fp.Fingerprint) (*AcoustIDLookupRe
 	var lookupResp AcoustIDLookupResp
 	err = json.NewDecoder(resp.Body).Decode(&lookupResp)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
@@ -89,6 +91,8 @@ func handleErrResp(resp *http.Response) error {
 	if err != nil {
 		return err
 	}
+
+	log.Println(errResp)
 
 	return HTTPError{
 		code:    errResp.Error.Code,
