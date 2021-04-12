@@ -10,30 +10,29 @@ import (
 )
 
 var (
-	fingerprint string
-	duration    float32
-	apikey      string
+	apikey string
 )
 
 func init() {
 	rootCmd.AddCommand(acoustidCmd)
-	acoustidCmd.Flags().StringVarP(&fingerprint, "fingerp", "f", "", "audio fingerprint")
-	acoustidCmd.Flags().Float32VarP(&duration, "duration", "d", 0, "audio duration")
 	acoustidCmd.Flags().StringVarP(&apikey, "apikey", "k", "", "acustid key")
-	acoustidCmd.MarkFlagRequired("fingerp")
-	acoustidCmd.MarkFlagRequired("duration")
+	acoustidCmd.Flags().StringVarP(&inputFile, "audiofile", "a", "", "audio file path")
 	acoustidCmd.MarkFlagRequired("apikey")
+	acoustidCmd.MarkFlagRequired("audiofile")
 }
 
 var acoustidCmd = &cobra.Command{
 	Use:   "acoustid",
 	Short: "fetches the AcoustID ID and the MusicBrainz recording ID matching the fingerprint",
 	Run: func(cmd *cobra.Command, args []string) {
+		chroma := fp.ChromaIO{}
+		fingerp, err := chroma.CalcFingerprint(inputFile)
+		if err != nil {
+			panic(err)
+		}
+
 		acoustIDClient := meta.NewAcoustIDClient(apikey)
-		resp, err := acoustIDClient.LookupFingerprint(&fp.Fingerprint{
-			Duration: duration,
-			Value:    fingerprint,
-		})
+		resp, err := acoustIDClient.LookupFingerprint(fingerp)
 
 		if err != nil {
 			panic(err)
@@ -45,10 +44,10 @@ var acoustidCmd = &cobra.Command{
 			log.Printf("[acustid] %s \n", r.ID)
 
 			for _, recording := range r.Recordings {
-				log.Printf("[mb recording ID] %f \n", recording.MBRecordingsID)
+				log.Printf("[mb recording ID] %s \n", recording.MBRecordingsID)
 
 				for _, release := range recording.MBReleaseGroupsID {
-					log.Printf("[mb release ID] %f \n", release.ID)
+					log.Printf("[mb release ID] %s \n", release.ID)
 				}
 			}
 		}
