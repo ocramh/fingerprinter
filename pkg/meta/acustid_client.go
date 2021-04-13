@@ -92,18 +92,18 @@ func handleAcoustIDErrResp(resp *http.Response) error {
 
 // AcoustIDLookupResp is the type used to parse a successfull AcoustID JSON response
 type AcoustIDLookupResp struct {
-	Status  string         `json":"status"`
-	Results []lookupResult `json:"results"`
+	Status  string           `json":"status"`
+	Results []ACLookupResult `json:"results"`
 }
 
-type lookupResult struct {
+type ACLookupResult struct {
 	ID         string       `json:"id"`
 	Recordings []recordings `json:"recordings"`
 	Score      float32      `json:"score"`
 }
 
 type recordings struct {
-	MBRecordingsID    string            `json:"id"`
+	MBRecordingID     string            `json:"id"`
 	MBReleaseGroupsID []releaseGroupsID `json:"releasegroups"`
 	Sources           int               `json:"sources"`
 }
@@ -128,3 +128,9 @@ type acoustIDErr struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
+
+type ACResultsByScore []ACLookupResult
+
+func (a ACResultsByScore) Len() int           { return len(a) }
+func (a ACResultsByScore) Swap(i int, j int)  { a[i], a[j] = a[j], a[i] }
+func (a ACResultsByScore) Less(i, j int) bool { return a[i].Score > a[j].Score }
