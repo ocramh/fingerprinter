@@ -18,8 +18,12 @@ func init() {
 	rootCmd.AddCommand(verifyCmd)
 	verifyCmd.Flags().StringVarP(&apikey, "apikey", "k", "", "acoustid key")
 	verifyCmd.Flags().StringVarP(&audioPath, "audiopath", "a", "", "audio file(s) path")
+	verifyCmd.Flags().StringVarP(&appName, "appname", "n", "fingerprinter", "the name of the application")
+	verifyCmd.Flags().StringVarP(&semVer, "semver", "s", "0.0.1", "the application semantic version")
+	verifyCmd.Flags().StringVarP(&contactEmail, "email", "e", "", "contact email address")
 	verifyCmd.MarkFlagRequired("apikey")
 	verifyCmd.MarkFlagRequired("audiopath")
+	verifyCmd.MarkFlagRequired("email")
 }
 
 var verifyCmd = &cobra.Command{
@@ -29,7 +33,7 @@ var verifyCmd = &cobra.Command{
 
 		chromaMngr := &fp.ChromaIO{}
 		acClient := meta.NewAcoustIDClient(apikey)
-		mbClient := meta.NewMBClient("fingerprinter", "0.0.1", "marco@sygma.io")
+		mbClient := meta.NewMBClient(appName, semVer, contactEmail)
 
 		verifier := vf.NewAudioVerifier(chromaMngr, acClient, mbClient)
 		res, err := verifier.Analyze(audioPath)
