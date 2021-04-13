@@ -103,12 +103,12 @@ type ACLookupResult struct {
 }
 
 type Recordings struct {
-	MBRecordingID     string            `json:"id"`
-	MBReleaseGroupsID []releaseGroupsID `json:"releasegroups"`
-	Sources           int               `json:"sources"`
+	MBRecordingID     string         `json:"id"`
+	MBReleaseGroupsID []ReleaseGroup `json:"releasegroups"`
+	Sources           int            `json:"sources"`
 }
 
-type releaseGroupsID struct {
+type ReleaseGroup struct {
 	ID       string    `json:"id"`
 	Title    string    `json:"title"`
 	Type     string    `json:"type"`
