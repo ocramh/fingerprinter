@@ -29,7 +29,7 @@ var acoustidCmd = &cobra.Command{
 		chroma := fp.ChromaIO{}
 		fingerprints, err := chroma.CalcFingerprint(inputFile)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		acoustIDClient := meta.NewAcoustIDClient(apikey)
@@ -37,7 +37,7 @@ var acoustidCmd = &cobra.Command{
 		for _, fingerprint := range fingerprints {
 			resp, err := acoustIDClient.LookupFingerprint(fingerprint)
 			if err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 
 			log.Printf("[status] %s \n", resp.Status)
@@ -48,8 +48,10 @@ var acoustidCmd = &cobra.Command{
 				for _, recording := range r.Recordings {
 					log.Printf("[mb recording ID] %s \n", recording.MBRecordingsID)
 
-					for _, release := range recording.MBReleaseGroupsID {
-						log.Printf("[mb release ID] %s \n", release.ID)
+					for _, releaseGroup := range recording.MBReleaseGroupsID {
+						for _, release := range releaseGroup.Releases {
+							log.Printf("[mb release ID] %s \n", release.ID)
+						}
 					}
 				}
 			}

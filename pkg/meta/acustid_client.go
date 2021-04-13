@@ -2,12 +2,10 @@ package meta
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
 )
@@ -15,15 +13,12 @@ import (
 const (
 	// AcoustIDBaseURL is the base URL used for POSTing queries
 	AcoustIDBaseURL = "https://api.acoustid.org/v2/lookup"
-
-	// ReqTimeout is the POST resquets timeout in seconds
-	ReqTimeout = 5 * time.Second
 )
 
 var (
 	// lookupMeta is the metadata that will be added to a lookup response.
 	// Recordings and releasegroups ids values can be used to query the MusicBrainz API
-	lookupMeta = []string{"recordings", "recordingids", "releasegroups", "releasegroupids"}
+	lookupMeta = []string{"recordings", "recordingids", "releases", "releasesids", "releasegroups"}
 )
 
 // AcoustIDClient is the type responsible for interacting with the AcoustID API.
@@ -51,9 +46,7 @@ func (a *AcoustIDClient) LookupFingerprint(f *fp.Fingerprint) (*AcoustIDLookupRe
 	// req.Header.Add("Content-Encoding", "gzip")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	httpClient := &http.Client{
-		Timeout: ReqTimeout,
-	}
+	httpClient := newHTTPClient()
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -62,13 +55,12 @@ func (a *AcoustIDClient) LookupFingerprint(f *fp.Fingerprint) (*AcoustIDLookupRe
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, handleErrResp(resp)
+		return nil, handleAcoustIDErrResp(resp)
 	}
 
 	var lookupResp AcoustIDLookupResp
 	err = json.NewDecoder(resp.Body).Decode(&lookupResp)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
@@ -85,7 +77,7 @@ func (a *AcoustIDClient) buildLookupQueryVals(f *fp.Fingerprint) url.Values {
 	return values
 }
 
-func handleErrResp(resp *http.Response) error {
+func handleAcoustIDErrResp(resp *http.Response) error {
 	var errResp AcoustErrResp
 	err := json.NewDecoder(resp.Body).Decode(&errResp)
 	if err != nil {
@@ -93,7 +85,7 @@ func handleErrResp(resp *http.Response) error {
 	}
 
 	return HTTPError{
-		code:    errResp.Error.Code,
+		code:    resp.StatusCode,
 		message: errResp.Error.Message,
 	}
 }
@@ -117,7 +109,14 @@ type recordings struct {
 }
 
 type releaseGroupsID struct {
-	ID string `json:"id"`
+	ID       string    `json:"id"`
+	Title    string    `json:"title"`
+	Type     string    `json:"type"`
+	Releases []release `json:"releases"`
+}
+
+type release struct {
+	ID string `json:"id`
 }
 
 // AcoustErrResp is the type used to parse an AcoustID error JSON response

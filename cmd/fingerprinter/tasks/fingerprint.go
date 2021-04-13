@@ -25,7 +25,7 @@ var fpCmd = &cobra.Command{
 		chroma := fp.ChromaIO{}
 		fingerprints, err := chroma.CalcFingerprint(inputFile)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		for _, fingerprint := range fingerprints {
