@@ -14,7 +14,7 @@ import (
 const (
 	MusicBrainzRecordingURL = "https://musicbrainz.org/ws/2/recording"
 	MusicBrainzReleaseURL   = "https://musicbrainz.org/ws/2/release"
-	ReqDelay                = 1 * time.Second // MusicBrainz allows one request per second
+	MusicBrainzReqDelay     = 1 * time.Second // MusicBrainz allows one request per second
 )
 
 // MBClient is the type responsible for interacting with the MusicBrainz API.

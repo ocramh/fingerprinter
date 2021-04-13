@@ -18,7 +18,7 @@ var (
 func init() {
 	rootCmd.AddCommand(mbCmd)
 	mbCmd.Flags().StringVarP(&appName, "appname", "n", "fingerprinter", "the name of the application")
-	mbCmd.Flags().StringVarP(&semVer, "semver", "s", "0.0.1", "the applicationsemantic version")
+	mbCmd.Flags().StringVarP(&semVer, "semver", "s", "0.0.1", "the application semantic version")
 	mbCmd.Flags().StringVarP(&contactEmail, "email", "e", "", "contact email address")
 	mbCmd.Flags().StringVarP(&releaseID, "release", "r", "", "the release ID to lookup")
 	mbCmd.MarkFlagRequired("email")
