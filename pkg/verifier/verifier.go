@@ -51,13 +51,8 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 			return nil, errors.New("no results found")
 		}
 
-		log.Printf("[results] %v \n", acLookup.Results)
-		log.Printf("[results len] %v \n", len(acLookup.Results))
-
 		sort.Sort(meta.ACResultsByScore(acLookup.Results))
 		topAcMatch := acLookup.Results[0]
-
-		log.Printf("[results] %v \n", acLookup.Results)
 
 		for _, recording := range topAcMatch.Recordings {
 			log.Printf("[mb recording ID] %s \n", recording.MBRecordingID)
@@ -84,9 +79,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 		log.Printf("mb lookup release: %s \n", releaseID)
 		releaseInfo, err := a.mbClient.GetReleaseInfo(string(releaseID))
 		if err != nil {
-			log.Println(err)
-			continue
-			// return nil, err
+			return nil, err
 		}
 
 		var authors []Author
