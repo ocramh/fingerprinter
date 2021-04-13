@@ -37,6 +37,8 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 		return nil, err
 	}
 
+	log.Printf("generated %d fingerprints", len(fingerps))
+
 	// query acoustid to match fingerprints with recordings (aka tracks) and get
 	// associated releases (aka albums)
 	var availableRecordingIDS []string
@@ -53,6 +55,10 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 		sort.Sort(meta.ACResultsByScore(acLookup.Results))
 		topAcMatch := acLookup.Results[0]
+
+		if len(topAcMatch.Recordings) == 0 {
+			return nil, errors.New("no matches found on musicbrainz")
+		}
 
 		for _, recording := range topAcMatch.Recordings {
 			log.Printf("[mb recording ID] %s \n", recording.MBRecordingID)

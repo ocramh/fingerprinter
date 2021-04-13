@@ -98,11 +98,11 @@ type AcoustIDLookupResp struct {
 
 type ACLookupResult struct {
 	ID         string       `json:"id"`
-	Recordings []recordings `json:"recordings"`
+	Recordings []Recordings `json:"recordings"`
 	Score      float32      `json:"score"`
 }
 
-type recordings struct {
+type Recordings struct {
 	MBRecordingID     string            `json:"id"`
 	MBReleaseGroupsID []releaseGroupsID `json:"releasegroups"`
 	Sources           int               `json:"sources"`
