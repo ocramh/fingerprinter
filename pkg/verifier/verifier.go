@@ -66,14 +66,29 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 			for _, releaseGroup := range recording.MBReleaseGroupsID {
 				_, ok := a.acoustReleases[ReleaseGroupID(releaseGroup.ID)]
+				// store new release group or augment existing release group with releases
 				if !ok {
 					a.acoustReleases[ReleaseGroupID(releaseGroup.ID)] = releaseGroup
+				} else {
+					existingReleaseGroup := a.acoustReleases[ReleaseGroupID(releaseGroup.ID)]
+					for _, rg1 := range releaseGroup.Releases {
+						var releaseAlreadyExists bool
+						for _, rg2 := range existingReleaseGroup.Releases {
+							if rg1.ID == rg2.ID {
+								releaseAlreadyExists = true
+							}
+						}
+
+						if !releaseAlreadyExists {
+							existingReleaseGroup.Releases = append(existingReleaseGroup.Releases, rg1)
+							a.acoustReleases[ReleaseGroupID(releaseGroup.ID)] = existingReleaseGroup
+						}
+					}
 				}
 			}
 		}
 	}
 
-	// remove duplicated recordings
 	var analysis RecAnalysis
 	for _, releaseGroupInfo := range a.acoustReleases {
 		releaseData := ReleaseMeta{
@@ -111,6 +126,10 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 			for _, media := range releaseInfo.Media {
 				for _, trk := range media.Tracks {
+					if len(trk.Recording.ISRCs) == 0 {
+						continue
+					}
+
 					if !releaseData.hasTrack(trk) {
 						releaseData.Tracks = append(releaseData.Tracks, trk)
 					}
