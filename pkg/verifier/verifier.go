@@ -3,6 +3,7 @@ package verifier
 import (
 	"errors"
 	"log"
+	"path"
 	"sort"
 	"time"
 
@@ -22,6 +23,13 @@ type AudioVerifier struct {
 	acoustReleases map[ReleaseGroupID]meta.ReleaseGroup
 }
 
+// AvailableRecording contains the uploaded file path and its associated musicbrainz
+// recording ID
+type AvailableRecording struct {
+	ID       string
+	FilePath string
+}
+
 func NewAudioVerifier(ch *fp.ChromaIO, ac *meta.AcoustIDClient, mb *meta.MBClient) *AudioVerifier {
 	return &AudioVerifier{
 		chromaMngr:     ch,
@@ -39,7 +47,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 	// query acoustid to match fingerprints with recordings (aka tracks) and get
 	// associated releases (aka albums)
-	var availableRecordingIDS []string
+	var availableRecordings []AvailableRecording
 	for _, fingerp := range fingerps {
 		acLookup, err := a.acClient.LookupFingerprint(fingerp)
 		if err != nil {
@@ -61,7 +69,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 		for _, recording := range topAcMatch.Recordings {
 			log.Printf("[mb recording ID] %s \n", recording.MBRecordingID)
 
-			availableRecordingIDS = append(availableRecordingIDS, recording.MBRecordingID)
+			availableRecordings = append(availableRecordings, AvailableRecording{recording.MBRecordingID, path.Join(inputPath, fingerp.InputFile.Name())})
 
 			for _, releaseGroup := range recording.MBReleaseGroups {
 				releaseGroupInfo, ok := a.acoustReleases[ReleaseGroupID(releaseGroup.ID)]
@@ -119,9 +127,12 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 						releaseData.Tracks = append(releaseData.Tracks, trk)
 					}
 
-					for _, availableRecID := range availableRecordingIDS {
-						if trk.Recording.ID == availableRecID && !releaseData.hasAvailableTrack(availableRecID, trk.Recording.ISRCs) {
-							releaseData.AvailableTracks = append(releaseData.AvailableTracks, trk)
+					for _, availableRec := range availableRecordings {
+						if trk.Recording.ID == availableRec.ID && !releaseData.hasAvailableTrack(availableRec.ID, trk.Recording.ISRCs) {
+							releaseData.AvailableTracks = append(releaseData.AvailableTracks, AvailableTrack{
+								Track: trk,
+								Path:  availableRec.FilePath,
+							})
 						}
 					}
 				}
@@ -168,7 +179,12 @@ type ReleaseMeta struct {
 	Authors         []Author
 	LabelInfo       []Label
 	Tracks          []mb_types.Track
-	AvailableTracks []mb_types.Track
+	AvailableTracks []AvailableTrack
+}
+
+type AvailableTrack struct {
+	Track mb_types.Track
+	Path  string
 }
 
 type Author struct {
@@ -221,12 +237,12 @@ func (r ReleaseMeta) hasTrack(rec mb_types.Track) bool {
 
 func (r ReleaseMeta) hasAvailableTrack(recID string, isrcs []string) bool {
 	for _, rec := range r.AvailableTracks {
-		if rec.ID == recID {
+		if rec.Track.ID == recID {
 			return true
 		}
 
 		for _, newIsrc := range isrcs {
-			for _, knownIsrc := range rec.Recording.ISRCs {
+			for _, knownIsrc := range rec.Track.Recording.ISRCs {
 				if knownIsrc == newIsrc {
 					return true
 				}
