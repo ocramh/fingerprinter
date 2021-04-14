@@ -8,7 +8,11 @@ Specifically Fingerprinter can use the generated audio fingerprint to determine 
 
 ## Dependencies
 The only required dependency is Chromaprint.
-The provided Dockerfile comes with Chromaprint installed.
+When running the application locally, the Chromaprint executable (called `fpcalc`) must be on the `$PATH`.
+See the [Chromaprint repo](https://github.com/acoustid/chromaprint) for [downloads](https://github.com/acoustid/chromaprint/releases) and information about building it locally.
+
+The provided Dockerfile comes with Chromaprint installed and it is the recommended way to get up and running if installing local dependencies is not desirable.
+
 
 ## Usage
 Fingerprinter exposes a simple CLI interface to use for interacting with the binary.
