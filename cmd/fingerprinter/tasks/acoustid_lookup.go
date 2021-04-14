@@ -40,7 +40,6 @@ var acoustidCmd = &cobra.Command{
 				log.Fatal(err)
 			}
 
-			log.Printf("[status] %s \n", resp.Status)
 			for _, r := range resp.Results {
 				log.Printf("[score] %f \n", r.Score)
 				log.Printf("[acoustid] %s \n", r.ID)
@@ -48,7 +47,7 @@ var acoustidCmd = &cobra.Command{
 				for _, recording := range r.Recordings {
 					log.Printf("[mb recording ID] %s \n", recording.MBRecordingID)
 
-					for _, releaseGroup := range recording.MBReleaseGroupsID {
+					for _, releaseGroup := range recording.MBReleaseGroups {
 						for _, release := range releaseGroup.Releases {
 							log.Printf("[mb release ID] %s \n", release.ID)
 						}

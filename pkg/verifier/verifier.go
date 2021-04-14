@@ -59,12 +59,11 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 		}
 
 		for _, recording := range topAcMatch.Recordings {
-			log.Printf("[mb release-group ID] %s \n", recording.MBReleaseGroupsID)
 			log.Printf("[mb recording ID] %s \n", recording.MBRecordingID)
 
 			availableRecordingIDS = append(availableRecordingIDS, recording.MBRecordingID)
 
-			for _, releaseGroup := range recording.MBReleaseGroupsID {
+			for _, releaseGroup := range recording.MBReleaseGroups {
 				_, ok := a.acoustReleases[ReleaseGroupID(releaseGroup.ID)]
 				// store new release group or augment existing release group with releases
 				if !ok {
