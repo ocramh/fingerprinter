@@ -8,10 +8,10 @@ import (
 
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
 	meta "github.com/ocramh/fingerprinter/pkg/meta"
+	mb_types "github.com/ocramh/fingerprinter/pkg/meta/musicbrainz"
 )
 
-type AcoustReleaseID string
-type AcoustRecordingID string
+type ReleaseGroupID string
 
 // AudioVerifier is responsible for verifying the metadata integrity of individal
 // audio files or folders
@@ -19,7 +19,7 @@ type AudioVerifier struct {
 	chromaMngr     *fp.ChromaIO
 	acClient       *meta.AcoustIDClient
 	mbClient       *meta.MBClient
-	acoustReleases map[AcoustReleaseID][]AcoustRecordingID
+	acoustReleases map[ReleaseGroupID]meta.ReleaseGroup
 }
 
 func NewAudioVerifier(ch *fp.ChromaIO, ac *meta.AcoustIDClient, mb *meta.MBClient) *AudioVerifier {
@@ -27,7 +27,7 @@ func NewAudioVerifier(ch *fp.ChromaIO, ac *meta.AcoustIDClient, mb *meta.MBClien
 		chromaMngr:     ch,
 		acClient:       ac,
 		mbClient:       mb,
-		acoustReleases: make(map[AcoustReleaseID][]AcoustRecordingID),
+		acoustReleases: make(map[ReleaseGroupID]meta.ReleaseGroup),
 	}
 }
 
@@ -54,102 +54,121 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 		sort.Sort(meta.ACResultsByScore(acLookup.Results))
 		topAcMatch := acLookup.Results[0]
 
+		if len(topAcMatch.Recordings) == 0 {
+			return nil, errors.New("no matches found on musicbrainz")
+		}
+
 		for _, recording := range topAcMatch.Recordings {
 			log.Printf("[mb recording ID] %s \n", recording.MBRecordingID)
-			recordingID := AcoustRecordingID(recording.MBRecordingID)
+
 			availableRecordingIDS = append(availableRecordingIDS, recording.MBRecordingID)
 
-			for _, releaseGroup := range recording.MBReleaseGroupsID {
-				for _, release := range releaseGroup.Releases {
-					releaseID := AcoustReleaseID(release.ID)
-					_, ok := a.acoustReleases[releaseID]
-					if ok {
-						a.acoustReleases[releaseID] = append(a.acoustReleases[releaseID], recordingID)
-					} else {
-						a.acoustReleases[releaseID] = []AcoustRecordingID{recordingID}
-					}
+			for _, releaseGroup := range recording.MBReleaseGroups {
+				releaseGroupInfo, ok := a.acoustReleases[ReleaseGroupID(releaseGroup.ID)]
+				if !ok {
+					a.acoustReleases[ReleaseGroupID(releaseGroup.ID)] = releaseGroup
+				} else {
+					a.acoustReleases[ReleaseGroupID(releaseGroup.ID)] = *addMissingReleasesIDToGroup(&releaseGroup, &releaseGroupInfo)
 				}
 			}
 		}
 	}
 
-	// remove duplicated recordings
 	var analysis RecAnalysis
-	for releaseID := range a.acoustReleases {
-		log.Printf("mb lookup release: %s \n", releaseID)
-		releaseInfo, err := a.mbClient.GetReleaseInfo(string(releaseID))
-		if err != nil {
-			return nil, err
+	for _, releaseGroupInfo := range a.acoustReleases {
+		releaseData := ReleaseMeta{
+			ID:         releaseGroupInfo.ID,
+			Title:      releaseGroupInfo.Title,
+			ReleasedAt: time.Now(),
+			Authors:    []Author{},
+			LabelInfo:  []Label{},
+			Tracks:     []mb_types.Track{},
 		}
 
-		var authors []Author
-		for _, aut := range releaseInfo.Authors {
-			authors = append(authors, Author{ID: aut.ArtistMeta.ID, Name: aut.Name, Description: aut.Description})
-		}
+		for _, release := range releaseGroupInfo.Releases {
+			log.Printf("mb lookup release: %s \n", release.ID)
+			releaseInfo, err := a.mbClient.GetReleaseInfo(release.ID)
+			if err != nil {
+				return nil, err
+			}
 
-		var labels []Label
-		for _, lab := range releaseInfo.LabelInfo {
-			labels = append(labels, Label{ID: lab.Label.ID, Name: lab.Label.Name, Description: lab.Label.Description})
-		}
+			// set 1st release date
+			if time.Time(releaseInfo.ReleasedAt).Before(releaseData.ReleasedAt) {
+				releaseData.ReleasedAt = time.Time(releaseInfo.ReleasedAt)
+			}
 
-		analysis.MatchedReleases = append(analysis.MatchedReleases, ReleaseMeta{
-			ID:         releaseInfo.ID,
-			Title:      releaseInfo.Title,
-			ReleasedAt: time.Time(releaseInfo.ReleasedAt),
-			Authors:    authors,
-			LabelInfo:  labels,
-		})
+			for _, aut := range releaseInfo.Authors {
+				if !releaseData.hasAuthor(aut) {
+					releaseData.Authors = append(releaseData.Authors, Author{ID: aut.ArtistMeta.ID, Name: aut.Name, Description: aut.Description})
+				}
+			}
 
-		for _, media := range releaseInfo.Media {
-			for _, track := range media.Tracks {
-				for _, availableRecID := range availableRecordingIDS {
+			for _, lab := range releaseInfo.LabelInfo {
+				if !releaseData.hasLabel(lab.Label) {
+					releaseData.LabelInfo = append(releaseData.LabelInfo, Label{ID: lab.Label.ID, Name: lab.Label.Name, Description: lab.Label.Description})
+				}
+			}
 
-					if len(track.Recording.ISRCs) > 0 {
-						if track.Recording.ID == availableRecID && !analysis.hasAvailableRecording(availableRecID, track.Recording.ISRCs[0]) {
-							analysis.AvailableRecordings = append(analysis.AvailableRecordings, Recording{
-								ID:             track.ID,
-								ISRC:           track.Recording.ISRCs[0],
-								Title:          track.Title,
-								DurationMillis: track.DurationMillis,
-								Position:       track.Position,
-							})
+			for _, media := range releaseInfo.Media {
+				for _, trk := range media.Tracks {
+					if len(trk.Recording.ISRCs) == 0 {
+						continue
+					}
+
+					if !releaseData.hasTrack(trk) {
+						releaseData.Tracks = append(releaseData.Tracks, trk)
+					}
+
+					for _, availableRecID := range availableRecordingIDS {
+						if trk.Recording.ID == availableRecID && !releaseData.hasAvailableTrack(availableRecID, trk.Recording.ISRCs) {
+							releaseData.AvailableTracks = append(releaseData.AvailableTracks, trk)
 						}
 					}
 				}
 			}
+
+			time.Sleep(meta.MusicBrainzReqDelay)
 		}
 
-		time.Sleep(meta.MusicBrainzReqDelay)
+		analysis.MatchedReleases = append(analysis.MatchedReleases, releaseData)
 	}
 
 	return &analysis, nil
 }
 
-type RecAnalysis struct {
-	Valid               bool
-	Complete            bool
-	MatchedReleases     []ReleaseMeta
-	AvailableRecordings []Recording
-}
+// adds new releases IDs to the existing ReleaseGroup if they
+// if they are not already included
+func addMissingReleasesIDToGroup(new *meta.ReleaseGroup, existing *meta.ReleaseGroup) *meta.ReleaseGroup {
+	for _, rg1 := range new.Releases {
 
-func (r RecAnalysis) hasAvailableRecording(recID, isrc string) bool {
-	for _, rec := range r.AvailableRecordings {
-		if rec.ID == recID || rec.ISRC == isrc {
-			return true
+		var releaseAlreadyExists bool
+		for _, rg2 := range existing.Releases {
+			if rg1.ID == rg2.ID {
+				releaseAlreadyExists = true
+			}
+		}
+
+		if !releaseAlreadyExists {
+			existing.Releases = append(existing.Releases, rg1)
 		}
 	}
 
-	return false
+	return existing
+}
+
+type RecAnalysis struct {
+	MatchedReleases []ReleaseMeta
 }
 
 type ReleaseMeta struct {
-	ID         string
-	Title      string
-	ReleasedAt time.Time
-	Format     string
-	Authors    []Author
-	LabelInfo  []Label
-	Tracks     []Track
+	ID              string
+	Title           string
+	ReleasedAt      time.Time
+	Format          string
+	Authors         []Author
+	LabelInfo       []Label
+	Tracks          []mb_types.Track
+	AvailableTracks []mb_types.Track
 }
 
 type Author struct {
@@ -164,12 +183,56 @@ type Label struct {
 	Description string
 }
 
-type Track struct{}
+func (r ReleaseMeta) hasAuthor(a mb_types.Author) bool {
+	for _, aut := range r.Authors {
+		if a.ArtistMeta.ID == aut.ID {
+			return true
+		}
+	}
+	return false
+}
 
-type Recording struct {
-	ID             string
-	ISRC           string
-	Title          string
-	DurationMillis int
-	Position       int
+func (r ReleaseMeta) hasLabel(l mb_types.Label) bool {
+	for _, lab := range r.LabelInfo {
+		if l.ID == lab.ID {
+			return true
+		}
+	}
+	return false
+}
+
+func (r ReleaseMeta) hasTrack(rec mb_types.Track) bool {
+	for _, trk := range r.Tracks {
+		if trk.ID == rec.ID {
+			return true
+		}
+
+		for _, knownIsrc := range trk.Recording.ISRCs {
+			for _, newIsrc := range rec.Recording.ISRCs {
+				if knownIsrc == newIsrc {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func (r ReleaseMeta) hasAvailableTrack(recID string, isrcs []string) bool {
+	for _, rec := range r.AvailableTracks {
+		if rec.ID == recID {
+			return true
+		}
+
+		for _, newIsrc := range isrcs {
+			for _, knownIsrc := range rec.Recording.ISRCs {
+				if knownIsrc == newIsrc {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }

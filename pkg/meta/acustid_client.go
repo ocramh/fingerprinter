@@ -97,18 +97,18 @@ type AcoustIDLookupResp struct {
 }
 
 type ACLookupResult struct {
-	ID         string       `json:"id"`
-	Recordings []recordings `json:"recordings"`
-	Score      float32      `json:"score"`
+	ID         string      `json:"id"`
+	Recordings []Recording `json:"recordings"`
+	Score      float32     `json:"score"`
 }
 
-type recordings struct {
-	MBRecordingID     string            `json:"id"`
-	MBReleaseGroupsID []releaseGroupsID `json:"releasegroups"`
-	Sources           int               `json:"sources"`
+type Recording struct {
+	MBRecordingID   string         `json:"id"`
+	MBReleaseGroups []ReleaseGroup `json:"releasegroups"`
+	Sources         int            `json:"sources"`
 }
 
-type releaseGroupsID struct {
+type ReleaseGroup struct {
 	ID       string    `json:"id"`
 	Title    string    `json:"title"`
 	Type     string    `json:"type"`

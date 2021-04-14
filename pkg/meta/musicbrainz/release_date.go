@@ -14,9 +14,13 @@ func (m *ReleaseDate) UnmarshalJSON(b []byte) error {
 	}
 
 	const shortForm = "2006-01-02"
+	const xshortForm = "2006-01"
 	parsed, err := time.Parse(shortForm, releaseDateStr)
 	if err != nil {
-		return err
+		parsed, err = time.Parse(xshortForm, releaseDateStr)
+		if err != nil {
+			return err
+		}
 	}
 
 	*m = ReleaseDate(parsed)
