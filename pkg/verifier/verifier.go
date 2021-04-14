@@ -64,25 +64,11 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 			availableRecordingIDS = append(availableRecordingIDS, recording.MBRecordingID)
 
 			for _, releaseGroup := range recording.MBReleaseGroups {
-				_, ok := a.acoustReleases[ReleaseGroupID(releaseGroup.ID)]
-				// store new release group or augment existing release group with releases
+				releaseGroupInfo, ok := a.acoustReleases[ReleaseGroupID(releaseGroup.ID)]
 				if !ok {
 					a.acoustReleases[ReleaseGroupID(releaseGroup.ID)] = releaseGroup
 				} else {
-					existingReleaseGroup := a.acoustReleases[ReleaseGroupID(releaseGroup.ID)]
-					for _, rg1 := range releaseGroup.Releases {
-						var releaseAlreadyExists bool
-						for _, rg2 := range existingReleaseGroup.Releases {
-							if rg1.ID == rg2.ID {
-								releaseAlreadyExists = true
-							}
-						}
-
-						if !releaseAlreadyExists {
-							existingReleaseGroup.Releases = append(existingReleaseGroup.Releases, rg1)
-							a.acoustReleases[ReleaseGroupID(releaseGroup.ID)] = existingReleaseGroup
-						}
-					}
+					a.acoustReleases[ReleaseGroupID(releaseGroup.ID)] = *addMissingReleasesIDToGroup(&releaseGroup, &releaseGroupInfo)
 				}
 			}
 		}
@@ -101,7 +87,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 		for _, release := range releaseGroupInfo.Releases {
 			log.Printf("mb lookup release: %s \n", release.ID)
-			releaseInfo, err := a.mbClient.GetReleaseInfo(string(release.ID))
+			releaseInfo, err := a.mbClient.GetReleaseInfo(release.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -148,6 +134,26 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 	}
 
 	return &analysis, nil
+}
+
+// adds new releases IDs to the existing ReleaseGroup if they
+// if they are not already included
+func addMissingReleasesIDToGroup(new *meta.ReleaseGroup, existing *meta.ReleaseGroup) *meta.ReleaseGroup {
+	for _, rg1 := range new.Releases {
+
+		var releaseAlreadyExists bool
+		for _, rg2 := range existing.Releases {
+			if rg1.ID == rg2.ID {
+				releaseAlreadyExists = true
+			}
+		}
+
+		if !releaseAlreadyExists {
+			existing.Releases = append(existing.Releases, rg1)
+		}
+	}
+
+	return existing
 }
 
 type RecAnalysis struct {
