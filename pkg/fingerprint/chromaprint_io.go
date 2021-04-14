@@ -22,8 +22,9 @@ type ChromaIO struct{}
 // the struct to parse the chromaprint fpcalc command when executed with the -json
 // flag
 type Fingerprint struct {
-	Duration float32 `json:"duration"`
-	Value    string  `json:"fingerprint"`
+	Duration  float32 `json:"duration"`
+	Value     string  `json:"fingerprint"`
+	InputFile os.FileInfo
 }
 
 // CalcFingerprint returns the audio Fingerprint of the file at fPath.
@@ -50,6 +51,7 @@ func (c ChromaIO) CalcFingerprint(fPath string) ([]*Fingerprint, error) {
 	if err != nil {
 		return nil, err
 	}
+	fing.InputFile = fInfo
 
 	return []*Fingerprint{fing}, nil
 }
@@ -70,6 +72,7 @@ func scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 		if err != nil {
 			return nil, err
 		}
+		fing.InputFile = f
 
 		fings = append(fings, fing)
 	}
@@ -78,7 +81,12 @@ func scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 }
 
 func execFPcalc(filePath string) (*Fingerprint, error) {
-	cmd := exec.Command("fpcalc", "-json", filePath)
+	fpcalcExecPath, err := exec.LookPath("fpcalc")
+	if err != nil {
+		return nil, err
+	}
+
+	cmd := exec.Command(fpcalcExecPath, "-json", filePath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
