@@ -78,7 +78,7 @@ func scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 }
 
 func execFPcalc(filePath string) (*Fingerprint, error) {
-	cmd := exec.Command("/Users/zed/bin/fpcalc", "-json", filePath)
+	cmd := exec.Command("fpcalc", "-json", filePath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, err
