@@ -7,7 +7,7 @@ import (
 
 const (
 	// ReqTimeout is the POST resquets timeout in seconds
-	ReqTimeout = 5 * time.Second
+	ReqTimeout = 10 * time.Second
 )
 
 func newHTTPClient() *http.Client {

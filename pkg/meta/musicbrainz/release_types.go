@@ -21,6 +21,7 @@ type Track struct {
 	Position       int       `json:"position"`
 	ID             string    `json:"id"`
 	Recording      Recording `json:"recording"`
+	Authors        []Author  `json:"artist-credit"`
 }
 
 type Recording struct {
