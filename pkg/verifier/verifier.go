@@ -56,7 +56,8 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 		// order by score and get first one
 		if len(acLookup.Results) == 0 {
-			return nil, errors.New("no results found")
+			log.Printf("no results found for %s", fingerp.InputFile.Name())
+			continue
 		}
 
 		sort.Sort(meta.ACResultsByScore(acLookup.Results))
