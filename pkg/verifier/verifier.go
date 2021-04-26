@@ -61,6 +61,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 				FileName: fingerp.InputFile.Name(),
 				Reason:   "audio file fingerprint didn't match any known record",
 			})
+			continue
 		}
 
 		sort.Sort(meta.ACResultsByScore(acLookup.Results))
