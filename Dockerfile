@@ -1,6 +1,5 @@
-### BUILD STAGE ###
 FROM golang:1.15-alpine
-RUN apk apk update
+RUN apk update
 RUN apk add --no-cache --update \
   build-base \
   nasm \

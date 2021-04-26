@@ -1,7 +1,6 @@
 package verifier
 
 import (
-	"errors"
 	"log"
 	"path"
 	"sort"
@@ -48,6 +47,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 	// query acoustid to match fingerprints with recordings (aka tracks) and get
 	// associated releases (aka albums)
 	var availableRecordings []AvailableRecording
+	var unmatchedAudioFiles []UnmatchedFile
 	for _, fingerp := range fingerps {
 		acLookup, err := a.acClient.LookupFingerprint(fingerp)
 		if err != nil {
@@ -57,14 +57,21 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 		// order by score and get first one
 		if len(acLookup.Results) == 0 {
 			log.Printf("no results found for %s", fingerp.InputFile.Name())
-			continue
+			unmatchedAudioFiles = append(unmatchedAudioFiles, UnmatchedFile{
+				FileName: fingerp.InputFile.Name(),
+				Reason:   "audio file fingerprint didn't match any known record",
+			})
 		}
 
 		sort.Sort(meta.ACResultsByScore(acLookup.Results))
 		topAcMatch := acLookup.Results[0]
 
 		if len(topAcMatch.Recordings) == 0 {
-			return nil, errors.New("no matches found on musicbrainz")
+			log.Printf("no recordings found for %s", fingerp.InputFile.Name())
+			unmatchedAudioFiles = append(unmatchedAudioFiles, UnmatchedFile{
+				FileName: fingerp.InputFile.Name(),
+				Reason:   "audio file fingerprint didn't match any known release",
+			})
 		}
 
 		for _, recording := range topAcMatch.Recordings {
@@ -96,6 +103,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 		for _, release := range releaseGroupInfo.Releases {
 			log.Printf("mb lookup release: %s \n", release.ID)
+
 			releaseInfo, err := a.mbClient.GetReleaseInfo(release.ID)
 			if err != nil {
 				return nil, err
@@ -144,6 +152,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 		analysis.MatchedReleases = append(analysis.MatchedReleases, releaseData)
 	}
+	analysis.UnmatchedFiles = unmatchedAudioFiles
 
 	return &analysis, nil
 }
@@ -168,10 +177,13 @@ func addMissingReleasesIDToGroup(new *meta.ReleaseGroup, existing *meta.ReleaseG
 	return existing
 }
 
+// RecAnalysis is the result of performing audio analysis on a group of files
 type RecAnalysis struct {
 	MatchedReleases []ReleaseMeta
+	UnmatchedFiles  []UnmatchedFile
 }
 
+// ReleaseMeta contains metadata that describes a single release
 type ReleaseMeta struct {
 	ID              string
 	Title           string
@@ -234,6 +246,13 @@ func (r ReleaseMeta) hasTrack(rec mb_types.Track) bool {
 	}
 
 	return false
+}
+
+// UnmatchedFile descirbes an audio file that doesn't match any entry on either
+// acoustID or musicbrainz
+type UnmatchedFile struct {
+	FileName string
+	Reason   string
 }
 
 func (r ReleaseMeta) hasAvailableTrack(recID string, isrcs []string) bool {

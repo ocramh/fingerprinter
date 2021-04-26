@@ -65,7 +65,7 @@ func (m *MBClient) GetRecordingInfo(recordingID string) (*mb.RecordingInfo, erro
 }
 
 // GetReleaseInfo returns a release metadata. Releases a real-world release objects
-// (like a physical album) that contain one or more Recordings
+// such as a physical album that contains one or more Recordings
 func (m *MBClient) GetReleaseInfo(releaseID string) (*mb.ReleaseInfo, error) {
 	includeVals := []string{"artists", "labels", "isrcs", "recordings", "artist-credits"}
 	req, err := m.newMBGETRequest(MusicBrainzReleaseURL, releaseID, includeVals)
