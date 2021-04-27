@@ -1,4 +1,4 @@
-package meta
+package clients
 
 import (
 	"errors"
@@ -9,6 +9,7 @@ var (
 	ErrStatusNotOK = errors.New("the response status code was not ok")
 )
 
+// HTTPError is the Error interface implementation used for HTTP errors
 type HTTPError struct {
 	message string
 	code    int

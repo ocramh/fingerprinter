@@ -1,4 +1,4 @@
-package meta
+package clients
 
 import (
 	"encoding/json"
@@ -17,17 +17,17 @@ const (
 	MusicBrainzReqDelay     = 1 * time.Second // MusicBrainz allows one request per second
 )
 
-// MBClient is the type responsible for interacting with the MusicBrainz API.
+// MusicBrainz is the type responsible for interacting with the MusicBrainz API.
 // See https://musicbrainz.org/doc/MusicBrainz_AP for API docs
-type MBClient struct {
+type MusicBrainz struct {
 	appName      string
 	appSemVer    string
 	contactEmail string
 }
 
-// NewMBClient is the MBHTTPClient constructor
-func NewMBClient(appName string, appSemVer string, email string) *MBClient {
-	return &MBClient{
+// NewMusicBrainz is the MBHTTPClient constructor
+func NewMusicBrainz(appName string, appSemVer string, email string) *MusicBrainz {
+	return &MusicBrainz{
 		appName:      appName,
 		appSemVer:    appSemVer,
 		contactEmail: email,
@@ -37,7 +37,7 @@ func NewMBClient(appName string, appSemVer string, email string) *MBClient {
 // GetRecordingInfo returns a single recording (or track) metadata.
 // Metadata includes ISRC codes, releases info, recording titie, duration,
 // release date, artists etc
-func (m *MBClient) GetRecordingInfo(recordingID string) (*mb.RecordingInfo, error) {
+func (m *MusicBrainz) GetRecordingInfo(recordingID string) (*mb.RecordingInfo, error) {
 	includeVals := []string{"artists", "isrcs", "releases"}
 	req, err := m.newMBGETRequest(MusicBrainzRecordingURL, recordingID, includeVals)
 	if err != nil {
@@ -66,7 +66,7 @@ func (m *MBClient) GetRecordingInfo(recordingID string) (*mb.RecordingInfo, erro
 
 // GetReleaseInfo returns a release metadata. Releases a real-world release objects
 // such as a physical album that contains one or more Recordings
-func (m *MBClient) GetReleaseInfo(releaseID string) (*mb.ReleaseInfo, error) {
+func (m *MusicBrainz) GetReleaseInfo(releaseID string) (*mb.ReleaseInfo, error) {
 	includeVals := []string{"artists", "labels", "isrcs", "recordings", "artist-credits"}
 	req, err := m.newMBGETRequest(MusicBrainzReleaseURL, releaseID, includeVals)
 	if err != nil {
@@ -93,7 +93,7 @@ func (m *MBClient) GetReleaseInfo(releaseID string) (*mb.ReleaseInfo, error) {
 	return &relInfo, nil
 }
 
-func (m *MBClient) handleMBErrResp(r *http.Response) error {
+func (m *MusicBrainz) handleMBErrResp(r *http.Response) error {
 	var errResp mb.MBError
 	err := json.NewDecoder(r.Body).Decode(&errResp)
 	if err != nil {
@@ -108,7 +108,7 @@ func (m *MBClient) handleMBErrResp(r *http.Response) error {
 
 // newMBGETRequest builds a new MusicBrainz HTTP GET request.
 // It takes care of setting the right headers and url formatting
-func (m *MBClient) newMBGETRequest(baseURL string, entityID string, inc []string) (*http.Request, error) {
+func (m *MusicBrainz) newMBGETRequest(baseURL string, entityID string, inc []string) (*http.Request, error) {
 	reqURL, err := url.Parse(fmt.Sprintf("%s/%s", baseURL, entityID))
 	if err != nil {
 		return nil, err
