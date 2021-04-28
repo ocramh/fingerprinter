@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/ocramh/fingerprinter/pkg/clients"
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
-	"github.com/ocramh/fingerprinter/pkg/meta"
 )
 
 var (
@@ -32,7 +32,7 @@ var acoustidCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		acoustIDClient := meta.NewAcoustIDClient(apikey)
+		acoustIDClient := clients.NewAcoustID(apikey)
 
 		for _, fingerprint := range fingerprints {
 			resp, err := acoustIDClient.LookupFingerprint(fingerprint)

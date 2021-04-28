@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	mb "github.com/ocramh/fingerprinter/pkg/meta/musicbrainz"
+	mb "github.com/ocramh/fingerprinter/pkg/clients/musicbrainz"
 )
 
 const (

@@ -1,4 +1,5 @@
 PKG=github.com/ocramh/fingerprinter
+COVERAGE_DIR=coverage
 
 .DEFAULT_GOAL = help
 

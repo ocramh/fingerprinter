@@ -30,7 +30,7 @@ var fpCmd = &cobra.Command{
 
 		for _, fingerprint := range fingerprints {
 			log.Printf("[duration] %f\n", fingerprint.Duration)
-			log.Printf("[fingerprint] %f\n", fingerprint.Value)
+			log.Printf("[fingerprint] %s\n", fingerprint.Value)
 		}
 	},
 }

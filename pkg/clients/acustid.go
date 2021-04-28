@@ -28,7 +28,7 @@ type AcoustID struct {
 	apiKey string
 }
 
-// NewAcoustID is the AcoustID cnstructor
+// NewAcoustID is the AcoustID constructor
 func NewAcoustID(k string) *AcoustID {
 	return &AcoustID{k}
 }
@@ -43,7 +43,6 @@ func (a *AcoustID) LookupFingerprint(f *fp.Fingerprint) (*AcoustIDLookupResp, er
 		return nil, err
 	}
 
-	// req.Header.Add("Content-Encoding", "gzip")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	httpClient := newHTTPClient()
@@ -92,31 +91,35 @@ func handleAcoustIDErrResp(resp *http.Response) error {
 
 // AcoustIDLookupResp is the type used to parse a successfull AcoustID JSON response
 type AcoustIDLookupResp struct {
-	Status  string           `json":"status"`
+	Status  string           `json:"status"`
 	Results []ACLookupResult `json:"results"`
 }
 
+// ACLookupResult is a fingerprint match. It contaons one or more recordings that
+// include the audio fingerprint analized and the accuracy score
 type ACLookupResult struct {
 	ID         string      `json:"id"`
-	Recordings []Recording `json:"recordings"`
 	Score      float32     `json:"score"`
+	Recordings []Recording `json:"recordings"`
 }
 
+// Recording is a single recording as defined by the MusicBrainz catalogue
 type Recording struct {
 	MBRecordingID   string         `json:"id"`
 	MBReleaseGroups []ReleaseGroup `json:"releasegroups"`
-	Sources         int            `json:"sources"`
 }
 
+// ReleaseGroup is a logical group of releases
 type ReleaseGroup struct {
 	ID       string    `json:"id"`
 	Title    string    `json:"title"`
 	Type     string    `json:"type"`
-	Releases []release `json:"releases"`
+	Releases []Release `json:"releases"`
 }
 
-type release struct {
-	ID string `json:"id`
+// Release identifies a unique release on the MusicBrainz catalogue
+type Release struct {
+	ID string `json:"id"`
 }
 
 // AcoustErrResp is the type used to parse an AcoustID error JSON response
@@ -129,6 +132,8 @@ type acoustIDErr struct {
 	Message string `json:"message"`
 }
 
+// ACResultsByScore is the ACLookupResult implementation of the sort.Interface
+// used for sorting results by score
 type ACResultsByScore []ACLookupResult
 
 func (a ACResultsByScore) Len() int           { return len(a) }

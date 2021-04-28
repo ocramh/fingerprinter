@@ -1,0 +1,141 @@
+{
+  "results": [
+    {
+      "id": "033908fc-19da-4afa-a8a8-f8e1b87ada75",
+      "recordings": [
+        {
+          "id": "d4d24fa2-22f5-4b02-8751-8c0cf9cd02b2",
+          "releasegroups": [
+            {
+              "artists": [
+                {
+                  "id": "8522b9b6-b295-48d7-9a10-8618fb80beb8",
+                  "name": "Battles"
+                }
+              ],
+              "id": "baca2dcc-b3e7-4e5f-9560-68513356125d",
+              "releases": [
+                {
+                  "artists": [
+                    {
+                      "id": "8522b9b6-b295-48d7-9a10-8618fb80beb8",
+                      "name": "Battles"
+                    }
+                  ],
+                  "country": "GB",
+                  "date": {
+                    "day": 18,
+                    "month": 9,
+                    "year": 2015
+                  },
+                  "id": "c100950b-5000-402c-a0dc-eb334840d134",
+                  "medium_count": 2,
+                  "releaseevents": [
+                    {
+                      "country": "GB",
+                      "date": {
+                        "day": 18,
+                        "month": 9,
+                        "year": 2015
+                      }
+                    }
+                  ],
+                  "title": "La Di Da Di",
+                  "track_count": 12
+                },
+                {
+                  "artists": [
+                    {
+                      "id": "8522b9b6-b295-48d7-9a10-8618fb80beb8",
+                      "name": "Battles"
+                    }
+                  ],
+                  "country": "XW",
+                  "date": {
+                    "day": 18,
+                    "month": 9,
+                    "year": 2015
+                  },
+                  "id": "c0925a40-863c-4df7-bb22-8a2f74c124c2",
+                  "medium_count": 1,
+                  "releaseevents": [
+                    {
+                      "country": "XW",
+                      "date": {
+                        "day": 18,
+                        "month": 9,
+                        "year": 2015
+                      }
+                    }
+                  ],
+                  "title": "La Di Da Di",
+                  "track_count": 12
+                },
+                {
+                  "artists": [
+                    {
+                      "id": "8522b9b6-b295-48d7-9a10-8618fb80beb8",
+                      "name": "Battles"
+                    }
+                  ],
+                  "country": "JP",
+                  "date": {
+                    "day": 15,
+                    "month": 9,
+                    "year": 2015
+                  },
+                  "id": "6e1d42d8-0cd5-4774-8606-ce33687893bc",
+                  "medium_count": 1,
+                  "releaseevents": [
+                    {
+                      "country": "JP",
+                      "date": {
+                        "day": 15,
+                        "month": 9,
+                        "year": 2015
+                      }
+                    }
+                  ],
+                  "title": "La Di Da Di",
+                  "track_count": 13
+                },
+                {
+                  "artists": [
+                    {
+                      "id": "8522b9b6-b295-48d7-9a10-8618fb80beb8",
+                      "name": "Battles"
+                    }
+                  ],
+                  "country": "GB",
+                  "date": {
+                    "day": 18,
+                    "month": 9,
+                    "year": 2015
+                  },
+                  "id": "05ea68c9-0f99-4b18-bddc-3f3f584b6143",
+                  "medium_count": 1,
+                  "releaseevents": [
+                    {
+                      "country": "GB",
+                      "date": {
+                        "day": 18,
+                        "month": 9,
+                        "year": 2015
+                      }
+                    }
+                  ],
+                  "title": "La Di Da Di",
+                  "track_count": 12
+                }
+              ],
+              "title": "La Di Da Di",
+              "type": "Album"
+            }
+          ]
+        }
+      ],
+      "score": 0.995636
+    }
+  ],
+  "status": "ok"
+}

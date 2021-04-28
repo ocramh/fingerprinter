@@ -9,7 +9,7 @@ import (
 )
 
 func TestHTTPErrorMessage(t *testing.T) {
-	statusCode := http.StatusNotFount
+	statusCode := http.StatusNotFound
 	msg := "item not found"
 	httperr := NewHTTPError(statusCode, msg)
 
