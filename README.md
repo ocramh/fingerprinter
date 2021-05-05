@@ -9,6 +9,8 @@ Specifically Fingerprinter can use the generated audio fingerprint to determine 
 ## Status
 In Progress
 
+[![Actions Status](https://github.com/ocramh/fingerprinter/workflows/Test/badge.svg)](https://github.com/ocramh/fingerprinter/actions)
+
 ## Dependencies
 The only required dependency is Chromaprint.
 When running the application locally, the Chromaprint executable (called `fpcalc`) must be on the `$PATH`.
