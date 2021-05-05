@@ -6,13 +6,15 @@ Fingerprints can then be used to identify metadata associate with the original f
 This tool leverages [Chromaprint](https://acoustid.org/chromaprint) and its associated [Acoustid Web Service](https://acoustid.org/webservice) to generate and parse acoustic fingerprinting and ultimately verify the origin and content of an audio file.
 Specifically Fingerprinter can use the generated audio fingerprint to determine the author, album, record label and ISRC codes associated with a recording.
 
+## Status
+In Progress
+
 ## Dependencies
 The only required dependency is Chromaprint.
 When running the application locally, the Chromaprint executable (called `fpcalc`) must be on the `$PATH`.
 See the [Chromaprint repo](https://github.com/acoustid/chromaprint) for [downloads](https://github.com/acoustid/chromaprint/releases) and information about building it locally.
 
 The provided Dockerfile comes with Chromaprint installed and it is the recommended way to get up and running if installing local dependencies is not desirable.
-
 
 ## Usage
 Fingerprinter exposes a simple CLI interface to use for interacting with the binary.
