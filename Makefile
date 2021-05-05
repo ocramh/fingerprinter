@@ -1,4 +1,5 @@
 PKG=github.com/ocramh/fingerprinter
+DOCKER_IMAGE_NAME=ocramh/fingerprinter
 COVERAGE_DIR=coverage
 
 .DEFAULT_GOAL = help
@@ -24,9 +25,9 @@ test: ## runs unit tests
 
 .PHONY: docker-run
 docker-run: ## builds and runs the app docker container
-	docker build -t sygma/fingerprinter .
+	docker build -t $(DOCKER_IMAGE_NAME) .
 	docker run -it \
 		--rm \
 		--entrypoint=/bin/sh \
 		--name fingerprinter \
-		sygma/fingerprinter
+		$(DOCKER_IMAGE_NAME)

@@ -17,6 +17,16 @@ const (
 	MusicBrainzReqDelay     = 1 * time.Second // MusicBrainz allows one request per second
 )
 
+var (
+	// RecordingInfoQueryVals are the query values requested when retrieving a
+	// recording metadata
+	RecordingInfoQueryVals = []string{"artists", "isrcs", "releases"}
+
+	// ReleaseInfoQueryVals are the query values requested when retrieving a release
+	// metadata
+	ReleaseInfoQueryVals = []string{"artists", "labels", "isrcs", "recordings", "artist-credits"}
+)
+
 // MusicBrainz is the type responsible for interacting with the MusicBrainz API.
 // See https://musicbrainz.org/doc/MusicBrainz_AP for API docs
 type MusicBrainz struct {
@@ -38,11 +48,11 @@ func NewMusicBrainz(appName string, appSemVer string, email string) *MusicBrainz
 // Metadata includes ISRC codes, releases info, recording titie, duration,
 // release date, artists etc
 func (m *MusicBrainz) GetRecordingInfo(recordingID string) (*mb.RecordingInfo, error) {
-	includeVals := []string{"artists", "isrcs", "releases"}
-	req, err := m.newMBGETRequest(MusicBrainzRecordingURL, recordingID, includeVals)
+	req, err := m.newMBGETRequest(MusicBrainzRecordingURL, recordingID, RecordingInfoQueryVals)
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Add("Content-Type", "application/json")
 
 	httpClient := newHTTPClient()
 	resp, err := httpClient.Do(req)
@@ -67,11 +77,11 @@ func (m *MusicBrainz) GetRecordingInfo(recordingID string) (*mb.RecordingInfo, e
 // GetReleaseInfo returns a release metadata. Releases a real-world release objects
 // such as a physical album that contains one or more Recordings
 func (m *MusicBrainz) GetReleaseInfo(releaseID string) (*mb.ReleaseInfo, error) {
-	includeVals := []string{"artists", "labels", "isrcs", "recordings", "artist-credits"}
-	req, err := m.newMBGETRequest(MusicBrainzReleaseURL, releaseID, includeVals)
+	req, err := m.newMBGETRequest(MusicBrainzReleaseURL, releaseID, ReleaseInfoQueryVals)
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Add("Content-Type", "application/json")
 
 	httpClient := newHTTPClient()
 	resp, err := httpClient.Do(req)
@@ -115,7 +125,7 @@ func (m *MusicBrainz) newMBGETRequest(baseURL string, entityID string, inc []str
 	}
 
 	reqParams := url.Values{}
-	reqParams.Set("fmt", "json")
+	reqParams.Set("fmt", "json") // takes precedence over Content-Type header
 	reqParams.Add("inc", strings.Join(inc, "+"))
 
 	reqURL.RawQuery = reqParams.Encode()

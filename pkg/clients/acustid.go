@@ -42,7 +42,6 @@ func (a *AcoustID) LookupFingerprint(f *fp.Fingerprint) (*AcoustIDLookupResp, er
 	if err != nil {
 		return nil, err
 	}
-
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	httpClient := newHTTPClient()
