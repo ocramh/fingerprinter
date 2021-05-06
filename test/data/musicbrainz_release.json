@@ -1,0 +1,413 @@
+{
+  "date": "2014-01-01",
+  "cover-art-archive": {
+    "darkened": false,
+    "artwork": false,
+    "count": 0,
+    "front": false,
+    "back": false
+  },
+  "packaging": null,
+  "text-representation": {
+    "script": null,
+    "language": "eng"
+  },
+  "id": "8fbf8fa5-3f6a-4829-af13-b84c3b1363d2",
+  "packaging-id": null,
+  "release-events": [
+    {
+      "area": {
+        "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+        "disambiguation": "",
+        "type-id": null,
+        "iso-3166-1-codes": [
+          "XW"
+        ],
+        "sort-name": "[Worldwide]",
+        "name": "[Worldwide]",
+        "type": null
+      },
+      "date": "2014-01-01"
+    }
+  ],
+  "media": [
+    {
+      "track-offset": 0,
+      "title": "",
+      "track-count": 20,
+      "format": "Digital Media",
+      "format-id": "907a28d9-b3b2-3ef6-89a8-7b18d91d4794",
+      "tracks": [
+        {
+          "length": 88667,
+          "title": "Intro",
+          "position": 1,
+          "recording": {
+            "id": "ba37cd81-e8f8-4d19-a4c2-f69df43d5e84",
+            "disambiguation": "",
+            "video": false,
+            "length": 88667,
+            "first-release-date": "2014-01-01",
+            "title": "Intro",
+            "isrcs": []
+          },
+          "id": "6bac4305-8258-4623-9734-8a47a6cf76d8",
+          "number": "1"
+        },
+        {
+          "title": "To Be Lost",
+          "length": 209333,
+          "number": "2",
+          "id": "6c483772-ee61-415c-a088-9370a811b488",
+          "position": 2,
+          "recording": {
+            "id": "d120a322-9ac4-4270-bb3a-e9f5dbc12012",
+            "disambiguation": "",
+            "video": false,
+            "title": "To Be Lost",
+            "isrcs": [],
+            "first-release-date": "2014-01-01",
+            "length": 209333
+          }
+        },
+        {
+          "length": 165333,
+          "title": "Called Your Bluff",
+          "id": "0603c005-9977-48ca-9ac7-37e04a6d6109",
+          "position": 3,
+          "recording": {
+            "isrcs": [],
+            "title": "Called Your Bluff",
+            "first-release-date": "2014-01-01",
+            "length": 165333,
+            "id": "0eba0b4b-f1e3-4444-b270-f401d0b14d8f",
+            "video": false,
+            "disambiguation": ""
+          },
+          "number": "3"
+        },
+        {
+          "length": 52667,
+          "title": "Beats by the Pound",
+          "recording": {
+            "id": "53ef804e-7224-4f5a-9c78-2dbfdb75919c",
+            "video": false,
+            "disambiguation": "",
+            "isrcs": [],
+            "title": "Beats by the Pound",
+            "first-release-date": "2014-01-01",
+            "length": 52667
+          },
+          "position": 4,
+          "id": "ff8dc46a-9cbc-4bc5-88f5-e8fc32c7aa87",
+          "number": "4"
+        },
+        {
+          "title": "Put Your Title to Waste",
+          "length": 190000,
+          "number": "5",
+          "id": "76dd86ab-e52c-486f-895d-0be6b370408a",
+          "position": 5,
+          "recording": {
+            "first-release-date": "2014-01-01",
+            "isrcs": [],
+            "title": "Put Your Title to Waste",
+            "length": 190000,
+            "disambiguation": "",
+            "id": "252daf78-386b-4044-86a7-ebb43f778312",
+            "video": false
+          }
+        },
+        {
+          "length": 273333,
+          "title": "The Indicator",
+          "recording": {
+            "length": 273333,
+            "isrcs": [],
+            "title": "The Indicator",
+            "first-release-date": "2014-01-01",
+            "id": "fa21bbdc-87d7-4ef1-9e94-644345fb3aae",
+            "video": false,
+            "disambiguation": ""
+          },
+          "position": 6,
+          "id": "cde015f2-9c88-4788-aa5b-6ab008fdaa02",
+          "number": "6"
+        },
+        {
+          "number": "7",
+          "position": 7,
+          "recording": {
+            "length": 163333,
+            "first-release-date": "2014-01-01",
+            "title": "Mind State",
+            "isrcs": [],
+            "disambiguation": "",
+            "id": "36d5d2a7-0bd2-48a8-aaeb-1243a4d46942",
+            "video": false
+          },
+          "id": "05aaa1a9-9184-423b-9995-32ca9caa0711",
+          "title": "Mind State",
+          "length": 163333
+        },
+        {
+          "id": "03d118ba-7e06-4e84-b216-8a7eed697249",
+          "recording": {
+            "length": 196000,
+            "first-release-date": "2014-01-01",
+            "title": "Down 4 The Kaz (The 1st Take)",
+            "isrcs": [],
+            "id": "82224180-d52c-40c5-9ff7-a9aae9e3c6c0",
+            "disambiguation": "",
+            "video": false
+          },
+          "position": 8,
+          "number": "8",
+          "length": 196000,
+          "title": "Down 4 The Kaz (The 1st Take)"
+        },
+        {
+          "number": "9",
+          "position": 9,
+          "recording": {
+            "first-release-date": "2014-01-01",
+            "title": "O.X. Veterans",
+            "isrcs": [],
+            "length": 276667,
+            "id": "41a94f52-ef76-4225-8bb2-7fbea1b7e7e5",
+            "disambiguation": "",
+            "video": false
+          },
+          "id": "f4baa9b2-b497-4bc4-b3ed-30c0430d6e20",
+          "title": "O.X. Veterans",
+          "length": 276667
+        },
+        {
+          "number": "10",
+          "id": "c205704c-6431-49eb-a48a-ee5067a2a68d",
+          "recording": {
+            "id": "1eb6e8c9-970c-4c96-9db5-b0a73da47efc",
+            "disambiguation": "",
+            "video": false,
+            "length": 223333,
+            "first-release-date": "2014-01-01",
+            "isrcs": [],
+            "title": "Battle Drills"
+          },
+          "position": 10,
+          "title": "Battle Drills",
+          "length": 223333
+        },
+        {
+          "title": "Sleep If You Want",
+          "length": 211333,
+          "number": "11",
+          "recording": {
+            "first-release-date": "2014-01-01",
+            "title": "Sleep If You Want",
+            "isrcs": [],
+            "length": 211333,
+            "id": "fb17a074-8298-4007-8da4-aafdcdd85c2a",
+            "video": false,
+            "disambiguation": ""
+          },
+          "position": 11,
+          "id": "b2777fa3-5ec4-44bf-b7cc-a4353d8c1a54"
+        },
+        {
+          "number": "12",
+          "id": "562f66b3-694a-4665-b0c4-486bf4aed7b4",
+          "recording": {
+            "video": false,
+            "id": "0731c749-454c-4569-a483-aa8c09859f66",
+            "disambiguation": "",
+            "title": "Corrections",
+            "isrcs": [],
+            "first-release-date": "2014-01-01",
+            "length": 176000
+          },
+          "position": 12,
+          "title": "Corrections",
+          "length": 176000
+        },
+        {
+          "title": "Snake eyes",
+          "length": 184000,
+          "number": "13",
+          "id": "79c6ac11-c8b4-4e29-954c-1a516b5843e8",
+          "position": 13,
+          "recording": {
+            "title": "Snake eyes",
+            "isrcs": [],
+            "first-release-date": "2014-01-01",
+            "length": 184000,
+            "id": "ed705acb-cb45-45c4-b4f8-27abfd49ee01",
+            "disambiguation": "",
+            "video": false
+          }
+        },
+        {
+          "id": "7807bc9f-9f95-40cd-9cde-461929eb826f",
+          "position": 14,
+          "recording": {
+            "disambiguation": "",
+            "id": "cc874322-4602-42db-8510-2376139b63dd",
+            "video": false,
+            "length": 166667,
+            "first-release-date": "2014-01-01",
+            "isrcs": [],
+            "title": "Tha Unstoppable"
+          },
+          "number": "14",
+          "length": 166667,
+          "title": "Tha Unstoppable"
+        },
+        {
+          "title": "Friendly Fire",
+          "length": 262667,
+          "number": "15",
+          "recording": {
+            "disambiguation": "",
+            "id": "c1796a48-4ce6-4df5-a5a6-d34590c0958c",
+            "video": false,
+            "length": 262667,
+            "isrcs": [],
+            "title": "Friendly Fire",
+            "first-release-date": "2014-01-01"
+          },
+          "position": 15,
+          "id": "299451e8-93c7-4157-ac29-cb4b3a53d9b6"
+        },
+        {
+          "length": 216667,
+          "title": "Make Your Ears Bleed",
+          "recording": {
+            "video": false,
+            "id": "462f92cf-1fd8-4f62-aa32-79e9f4a520ac",
+            "disambiguation": "",
+            "first-release-date": "2014-01-01",
+            "title": "Make Your Ears Bleed",
+            "isrcs": [],
+            "length": 216667
+          },
+          "position": 16,
+          "id": "0619ee76-e553-40c0-a6af-18763a321b0e",
+          "number": "16"
+        },
+        {
+          "title": "Battle Drills (remix)",
+          "length": 195333,
+          "number": "17",
+          "position": 17,
+          "recording": {
+            "length": 195333,
+            "title": "Battle Drills (remix)",
+            "isrcs": [],
+            "first-release-date": "2014-01-01",
+            "id": "9f08415c-1f48-4295-b532-175a834f8bda",
+            "video": false,
+            "disambiguation": ""
+          },
+          "id": "cdaa6a31-7384-4279-a375-839fe10bfaa9"
+        },
+        {
+          "number": "18",
+          "recording": {
+            "length": 164667,
+            "title": "Called Your Bluff (remix)",
+            "isrcs": [],
+            "first-release-date": "2014-01-01",
+            "video": false,
+            "id": "dfe22087-4c66-4de2-89b3-5bcb1ae1a3e3",
+            "disambiguation": ""
+          },
+          "position": 18,
+          "id": "fa401122-e18f-475b-a1a6-2e9a504b77e4",
+          "title": "Called Your Bluff (remix)",
+          "length": 164667
+        },
+        {
+          "position": 19,
+          "recording": {
+            "length": 205333,
+            "first-release-date": "2014-01-01",
+            "isrcs": [],
+            "title": "A.V.E.R.A.G.E.",
+            "id": "24862b0f-19d1-490a-a86e-1a4506421858",
+            "video": false,
+            "disambiguation": ""
+          },
+          "id": "6a6dc616-2a63-4d50-b997-3b0684e12ed1",
+          "number": "19",
+          "length": 205333,
+          "title": "A.V.E.R.A.G.E."
+        },
+        {
+          "length": 204000,
+          "title": "O.X. VETS The Lost Reel",
+          "position": 20,
+          "recording": {
+            "disambiguation": "",
+            "id": "107f3206-1fb8-4711-882b-7d1d9e2bd754",
+            "video": false,
+            "length": 204000,
+            "title": "O.X. VETS The Lost Reel",
+            "isrcs": [],
+            "first-release-date": "2014-01-01"
+          },
+          "id": "7bd8f605-dc74-4fe4-b09d-258eea09e626",
+          "number": "20"
+        }
+      ],
+      "position": 1
+    }
+  ],
+  "country": "XW",
+  "barcode": null,
+  "label-info": [
+    {
+      "catalog-number": null,
+      "label": {
+        "type-id": null,
+        "id": "3747e1ea-c45e-457a-80f6-de5f3ec72422",
+        "disambiguation": "hip-hop label",
+        "type": null,
+        "label-code": null,
+        "name": "Sergent Records",
+        "sort-name": "Sergent Records"
+      }
+    }
+  ],
+  "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+  "asin": null,
+  "quality": "normal",
+  "disambiguation": "",
+  "artist-credit": [
+    {
+      "joinphrase": " & ",
+      "artist": {
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+        "id": "ea9078ef-20ca-4506-81ea-2ae5fe3a42e8",
+        "disambiguation": "",
+        "sort-name": "Madlib",
+        "name": "Madlib",
+        "type": "Person"
+      },
+      "name": "Madlib"
+    },
+    {
+      "artist": {
+        "type": "Person",
+        "sort-name": "Kazi",
+        "name": "Kazi",
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+        "id": "1f5276d7-18bf-492e-9514-b0c32c9b45a2",
+        "disambiguation": "US rapper"
+      },
+      "name": "Kazi",
+      "joinphrase": ""
+    }
+  ],
+  "status": "Official",
+  "title": "Blackmarket Seminar"
+}
