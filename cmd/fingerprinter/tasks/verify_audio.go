@@ -28,7 +28,7 @@ func init() {
 
 var verifyCmd = &cobra.Command{
 	Use:   "verify",
-	Short: "verify inut audio metadata",
+	Short: "Verifies input audio metadata and returns the associated relase(s) info if a match was found",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		chromaMngr := &fp.ChromaIO{}

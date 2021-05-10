@@ -24,7 +24,7 @@ func init() {
 
 var acoustidCmd = &cobra.Command{
 	Use:   "acoustid",
-	Short: "fetches the AcoustID ID and the MusicBrainz recording ID matching the fingerprint",
+	Short: "Generate an audio fingerprint and queries the AcoustID API to find matching recording ID(s)",
 	Run: func(cmd *cobra.Command, args []string) {
 		chroma := fp.ChromaIO{}
 		fingerprints, err := chroma.CalcFingerprint(inputFile)

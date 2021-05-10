@@ -26,7 +26,7 @@ func init() {
 
 var mbCmd = &cobra.Command{
 	Use:   "mblookup",
-	Short: "queries the MusicBrainz API and returns recordings and releases metadata",
+	Short: "Queries the MusicBrainz API and returns recordings and releases metadata associated with a recording ID",
 	Run: func(cmd *cobra.Command, args []string) {
 		mbClient := clients.NewMusicBrainz(appName, semVer, contactEmail)
 		recInfo, err := mbClient.GetReleaseInfo(releaseID)
