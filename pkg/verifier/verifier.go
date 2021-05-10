@@ -48,8 +48,9 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 	// associated releases (aka albums)
 	var availableRecordings []AvailableRecording
 	var unmatchedAudioFiles []UnmatchedFile
+	var retryOnFail = true
 	for _, fingerp := range fingerps {
-		acLookup, err := a.acClient.LookupFingerprint(fingerp)
+		acLookup, err := a.acClient.LookupFingerprint(fingerp, retryOnFail)
 		if err != nil {
 			return nil, err
 		}

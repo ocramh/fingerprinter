@@ -1,11 +1,14 @@
 package clients
 
 import (
+	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
 )
@@ -13,6 +16,9 @@ import (
 const (
 	// AcoustIDBaseURL is the base URL used for POSTing queries
 	AcoustIDBaseURL = "https://api.acoustid.org/v2/lookup"
+
+	// The delay requests should respect when being fired in succession
+	AcoustIDReqDelay = 1 * time.Second
 )
 
 var (
@@ -36,33 +42,52 @@ func NewAcoustID(k string) *AcoustID {
 // LookupFingerprint uses audio fingerprints and duration values to search the AcoustID
 // fingerprint database and return the corresponding track ID and MusicBrainz
 // recording ID if a match was found
-func (a *AcoustID) LookupFingerprint(f *fp.Fingerprint) (*AcoustIDLookupResp, error) {
-	encodedPayload := a.buildLookupQueryVals(f).Encode()
-	req, err := http.NewRequest("POST", AcoustIDBaseURL, strings.NewReader(encodedPayload))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	httpClient := newHTTPClient()
-
-	resp, err := httpClient.Do(req)
+func (a *AcoustID) LookupFingerprint(f *fp.Fingerprint, withRetry bool) (*AcoustIDLookupResp, error) {
+	resp, err := a.doHTTPRequest((f))
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusServiceUnavailable {
+			if withRetry {
+				time.Sleep(retryAfterSec(resp))
+				return a.LookupFingerprint(f, false)
+			}
+
+			return nil, HTTPError{
+				code:    http.StatusServiceUnavailable,
+				message: "upstream service not available",
+			}
+		}
 		return nil, handleAcoustIDErrResp(resp)
 	}
 
 	var lookupResp AcoustIDLookupResp
-	err = json.NewDecoder(resp.Body).Decode(&lookupResp)
+	breader := bytes.NewReader(b)
+	err = json.NewDecoder(breader).Decode(&lookupResp)
 	if err != nil {
 		return nil, err
 	}
 
 	return &lookupResp, nil
+}
+
+func retryAfterSec(r *http.Response) time.Duration {
+	retryAfterH := r.Header.Get("Retry-After")
+	retryAfterSec, err := strconv.Atoi(retryAfterH)
+	if err != nil {
+		return AcoustIDReqDelay
+	}
+
+	return time.Duration(retryAfterSec) * time.Second
+
 }
 
 func (a *AcoustID) buildLookupQueryVals(f *fp.Fingerprint) url.Values {
@@ -73,6 +98,19 @@ func (a *AcoustID) buildLookupQueryVals(f *fp.Fingerprint) url.Values {
 	values.Add("fingerprint", f.Value)
 
 	return values
+}
+
+func (a *AcoustID) doHTTPRequest(f *fp.Fingerprint) (*http.Response, error) {
+	encodedPayload := a.buildLookupQueryVals(f).Encode()
+	req, err := http.NewRequest("POST", AcoustIDBaseURL, strings.NewReader(encodedPayload))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	httpClient := newHTTPClient()
+
+	return httpClient.Do(req)
 }
 
 func handleAcoustIDErrResp(resp *http.Response) error {

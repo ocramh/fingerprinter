@@ -33,9 +33,10 @@ var acoustidCmd = &cobra.Command{
 		}
 
 		acoustIDClient := clients.NewAcoustID(apikey)
+		retryOnFail := true
 
 		for _, fingerprint := range fingerprints {
-			resp, err := acoustIDClient.LookupFingerprint(fingerprint)
+			resp, err := acoustIDClient.LookupFingerprint(fingerprint, retryOnFail)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -55,7 +56,7 @@ var acoustidCmd = &cobra.Command{
 				}
 			}
 
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(clients.AcoustIDReqDelay)
 		}
 	},
 }

@@ -30,7 +30,7 @@ func TestLookupFingerprintOK(t *testing.T) {
 		Duration: 100,
 		Value:    "the-extracted-fingerprint",
 	}
-	got, err := acClient.LookupFingerprint(&fingerprint)
+	got, err := acClient.LookupFingerprint(&fingerprint, false)
 	assert.NoError(t, err)
 	assert.Equal(t, &AcoustIDLookupResp{
 		Status: "ok",
@@ -81,9 +81,33 @@ func TestLookupFingerprintStatusNotOK(t *testing.T) {
 		Duration: 100,
 		Value:    "the-extracted-fingerprint",
 	}
-	_, err = acClient.LookupFingerprint(&fingerprint)
+	_, err = acClient.LookupFingerprint(&fingerprint, false)
 	assert.Equal(t, HTTPError{
 		code:    http.StatusBadRequest,
 		message: "invalid fingerprint",
 	}, err)
+}
+
+func TestLookupFingerprintStatusServiceUnavailable(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", AcoustIDBaseURL,
+		func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusServiceUnavailable, []byte{})
+			return resp, nil
+		},
+	)
+
+	acClient := NewAcoustID("secret-key")
+	fingerprint := fp.Fingerprint{
+		Duration: 100,
+		Value:    "the-extracted-fingerprint",
+	}
+	_, err := acClient.LookupFingerprint(&fingerprint, true)
+	assert.Equal(t, HTTPError{
+		code:    http.StatusServiceUnavailable,
+		message: "upstream service not available",
+	}, err)
+	assert.Equal(t, 2, httpmock.GetTotalCallCount())
 }
