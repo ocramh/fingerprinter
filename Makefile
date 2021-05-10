@@ -1,4 +1,6 @@
 PKG=github.com/ocramh/fingerprinter
+DOCKER_IMAGE_NAME=ocramh/fingerprinter
+COVERAGE_DIR=coverage
 
 .DEFAULT_GOAL = help
 
@@ -14,11 +16,18 @@ help:  ## shows this help message
 install: ## installs the executable
 	go install ${PKG}/cmd/fingerprinter
 
+.PHONY: test
+test: ## runs unit tests
+	@mkdir -p $(COVERAGE_DIR)
+	@echo 'mode: atomic' > $(COVERAGE_DIR)/coverage.out
+	@go test ./... -coverprofile=$(COVERAGE_DIR)/coverage.out
+	@go tool cover -html=$(COVERAGE_DIR)/coverage.out -o $(COVERAGE_DIR)/coverage.html
+
 .PHONY: docker-run
 docker-run: ## builds and runs the app docker container
-	docker build -t sygma/fingerprinter .
+	docker build -t $(DOCKER_IMAGE_NAME) .
 	docker run -it \
 		--rm \
 		--entrypoint=/bin/sh \
 		--name fingerprinter \
-		sygma/fingerprinter
+		$(DOCKER_IMAGE_NAME)

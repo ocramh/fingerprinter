@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	clients "github.com/ocramh/fingerprinter/pkg/clients"
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
-	meta "github.com/ocramh/fingerprinter/pkg/meta"
 	vf "github.com/ocramh/fingerprinter/pkg/verifier"
 )
 
@@ -28,12 +28,12 @@ func init() {
 
 var verifyCmd = &cobra.Command{
 	Use:   "verify",
-	Short: "verify inut audio metadata",
+	Short: "Verifies input audio metadata and returns the associated relase(s) info if a match was found",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		chromaMngr := &fp.ChromaIO{}
-		acClient := meta.NewAcoustIDClient(apikey)
-		mbClient := meta.NewMBClient(appName, semVer, contactEmail)
+		acClient := clients.NewAcoustID(apikey)
+		mbClient := clients.NewMusicBrainz(appName, semVer, contactEmail)
 
 		verifier := vf.NewAudioVerifier(chromaMngr, acClient, mbClient)
 		res, err := verifier.Analyze(audioPath)

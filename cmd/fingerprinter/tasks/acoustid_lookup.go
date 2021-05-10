@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/ocramh/fingerprinter/pkg/clients"
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
-	"github.com/ocramh/fingerprinter/pkg/meta"
 )
 
 var (
@@ -24,7 +24,7 @@ func init() {
 
 var acoustidCmd = &cobra.Command{
 	Use:   "acoustid",
-	Short: "fetches the AcoustID ID and the MusicBrainz recording ID matching the fingerprint",
+	Short: "Generate an audio fingerprint and queries the AcoustID API to find matching recording ID(s)",
 	Run: func(cmd *cobra.Command, args []string) {
 		chroma := fp.ChromaIO{}
 		fingerprints, err := chroma.CalcFingerprint(inputFile)
@@ -32,10 +32,11 @@ var acoustidCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		acoustIDClient := meta.NewAcoustIDClient(apikey)
+		acoustIDClient := clients.NewAcoustID(apikey)
+		retryOnFail := true
 
 		for _, fingerprint := range fingerprints {
-			resp, err := acoustIDClient.LookupFingerprint(fingerprint)
+			resp, err := acoustIDClient.LookupFingerprint(fingerprint, retryOnFail)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -55,7 +56,7 @@ var acoustidCmd = &cobra.Command{
 				}
 			}
 
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(clients.AcoustIDReqDelay)
 		}
 	},
 }

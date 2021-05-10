@@ -1,0 +1,159 @@
+{
+  "artist-credit": [
+    {
+      "name": "Battles",
+      "artist": {
+        "type": "Group",
+        "name": "Battles",
+        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+        "id": "8522b9b6-b295-48d7-9a10-8618fb80beb8",
+        "sort-name": "Battles",
+        "disambiguation": "experimental rock band"
+      },
+      "joinphrase": ""
+    }
+  ],
+  "length": 180000,
+  "releases": [
+    {
+      "id": "6e1d42d8-0cd5-4774-8606-ce33687893bc",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging-id": null,
+      "barcode": "4523132112800",
+      "disambiguation": "",
+      "country": "JP",
+      "quality": "normal",
+      "status": "Official",
+      "packaging": null,
+      "date": "2015-09-15",
+      "release-events": [
+        {
+          "date": "2015-09-15",
+          "area": {
+            "iso-3166-1-codes": [
+              "JP"
+            ],
+            "disambiguation": "",
+            "sort-name": "Japan",
+            "id": "2db42837-c832-3c27-b4a3-08198f75693c",
+            "type-id": null,
+            "name": "Japan",
+            "type": null
+          }
+        }
+      ],
+      "title": "La Di Da Di"
+    },
+    {
+      "quality": "normal",
+      "status": "Official",
+      "date": "2015-09-18",
+      "packaging": "Gatefold Cover",
+      "release-events": [
+        {
+          "area": {
+            "type-id": null,
+            "type": null,
+            "name": "United Kingdom",
+            "disambiguation": "",
+            "iso-3166-1-codes": [
+              "GB"
+            ],
+            "sort-name": "United Kingdom",
+            "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed"
+          },
+          "date": "2015-09-18"
+        }
+      ],
+      "title": "La Di Da Di",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "id": "05ea68c9-0f99-4b18-bddc-3f3f584b6143",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "barcode": "0801061026325",
+      "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
+      "disambiguation": "",
+      "country": "GB"
+    },
+    {
+      "barcode": "0801061026318",
+      "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
+      "disambiguation": "",
+      "text-representation": {
+        "script": "Latn",
+        "language": "eng"
+      },
+      "id": "c100950b-5000-402c-a0dc-eb334840d134",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "country": "GB",
+      "status": "Official",
+      "quality": "normal",
+      "title": "La Di Da Di",
+      "packaging": "Gatefold Cover",
+      "date": "2015-09-18",
+      "release-events": [
+        {
+          "date": "2015-09-18",
+          "area": {
+            "name": "United Kingdom",
+            "type": null,
+            "type-id": null,
+            "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+            "sort-name": "United Kingdom",
+            "disambiguation": "",
+            "iso-3166-1-codes": [
+              "GB"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "La Di Da Di",
+      "packaging": null,
+      "date": "2015-09-18",
+      "release-events": [
+        {
+          "date": "2015-09-18",
+          "area": {
+            "sort-name": "[Worldwide]",
+            "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+            "disambiguation": "",
+            "iso-3166-1-codes": [
+              "XW"
+            ],
+            "type": null,
+            "name": "[Worldwide]",
+            "type-id": null
+          }
+        }
+      ],
+      "status": "Official",
+      "quality": "normal",
+      "country": "XW",
+      "barcode": null,
+      "packaging-id": null,
+      "disambiguation": "",
+      "id": "c0925a40-863c-4df7-bb22-8a2f74c124c2",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+    }
+  ],
+  "video": false,
+  "title": "Dot Net",
+  "isrcs": [
+    "GBBPW1500091"
+  ],
+  "disambiguation": "",
+  "first-release-date": "2015-09-15",
+  "id": "d4d24fa2-22f5-4b02-8751-8c0cf9cd02b2"
+}

@@ -20,7 +20,7 @@ func init() {
 
 var fpCmd = &cobra.Command{
 	Use:   "fpcalc",
-	Short: "calculates the fingerprint of the input audio file",
+	Short: "Calculates the fingerprint of the input audio file",
 	Run: func(cmd *cobra.Command, args []string) {
 		chroma := fp.ChromaIO{}
 		fingerprints, err := chroma.CalcFingerprint(inputFile)
@@ -30,7 +30,7 @@ var fpCmd = &cobra.Command{
 
 		for _, fingerprint := range fingerprints {
 			log.Printf("[duration] %f\n", fingerprint.Duration)
-			log.Printf("[fingerprint] %f\n", fingerprint.Value)
+			log.Printf("[fingerprint] %s\n", fingerprint.Value)
 		}
 	},
 }

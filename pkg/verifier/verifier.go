@@ -6,9 +6,9 @@ import (
 	"sort"
 	"time"
 
+	clients "github.com/ocramh/fingerprinter/pkg/clients"
+	mb_types "github.com/ocramh/fingerprinter/pkg/clients/musicbrainz"
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
-	meta "github.com/ocramh/fingerprinter/pkg/meta"
-	mb_types "github.com/ocramh/fingerprinter/pkg/meta/musicbrainz"
 )
 
 type ReleaseGroupID string
@@ -17,9 +17,9 @@ type ReleaseGroupID string
 // audio files or folders
 type AudioVerifier struct {
 	chromaMngr     *fp.ChromaIO
-	acClient       *meta.AcoustIDClient
-	mbClient       *meta.MBClient
-	acoustReleases map[ReleaseGroupID]meta.ReleaseGroup
+	acClient       *clients.AcoustID
+	mbClient       *clients.MusicBrainz
+	acoustReleases map[ReleaseGroupID]clients.ReleaseGroup
 }
 
 // AvailableRecording contains the uploaded file path and its associated musicbrainz
@@ -29,12 +29,12 @@ type AvailableRecording struct {
 	FilePath string
 }
 
-func NewAudioVerifier(ch *fp.ChromaIO, ac *meta.AcoustIDClient, mb *meta.MBClient) *AudioVerifier {
+func NewAudioVerifier(ch *fp.ChromaIO, ac *clients.AcoustID, mb *clients.MusicBrainz) *AudioVerifier {
 	return &AudioVerifier{
 		chromaMngr:     ch,
 		acClient:       ac,
 		mbClient:       mb,
-		acoustReleases: make(map[ReleaseGroupID]meta.ReleaseGroup),
+		acoustReleases: make(map[ReleaseGroupID]clients.ReleaseGroup),
 	}
 }
 
@@ -48,8 +48,9 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 	// associated releases (aka albums)
 	var availableRecordings []AvailableRecording
 	var unmatchedAudioFiles []UnmatchedFile
+	var retryOnFail = true
 	for _, fingerp := range fingerps {
-		acLookup, err := a.acClient.LookupFingerprint(fingerp)
+		acLookup, err := a.acClient.LookupFingerprint(fingerp, retryOnFail)
 		if err != nil {
 			return nil, err
 		}
@@ -64,7 +65,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 			continue
 		}
 
-		sort.Sort(meta.ACResultsByScore(acLookup.Results))
+		sort.Sort(clients.ACResultsByScore(acLookup.Results))
 		topAcMatch := acLookup.Results[0]
 
 		if len(topAcMatch.Recordings) == 0 {
@@ -148,7 +149,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 				}
 			}
 
-			time.Sleep(meta.MusicBrainzReqDelay)
+			time.Sleep(clients.MusicBrainzReqDelay)
 		}
 
 		analysis.MatchedReleases = append(analysis.MatchedReleases, releaseData)
@@ -160,7 +161,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 // adds new releases IDs to the existing ReleaseGroup if they
 // if they are not already included
-func addMissingReleasesIDToGroup(new *meta.ReleaseGroup, existing *meta.ReleaseGroup) *meta.ReleaseGroup {
+func addMissingReleasesIDToGroup(new *clients.ReleaseGroup, existing *clients.ReleaseGroup) *clients.ReleaseGroup {
 	for _, rg1 := range new.Releases {
 
 		var releaseAlreadyExists bool
