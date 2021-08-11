@@ -26,7 +26,7 @@ var acoustidCmd = &cobra.Command{
 	Use:   "acoustid",
 	Short: "Generate an audio fingerprint and queries the AcoustID API to find matching recording ID(s)",
 	Run: func(cmd *cobra.Command, args []string) {
-		chroma := fp.ChromaIO{}
+		chroma := fp.ChromaPrint{}
 		fingerprints, err := chroma.CalcFingerprint(inputFile)
 		if err != nil {
 			log.Fatal(err)

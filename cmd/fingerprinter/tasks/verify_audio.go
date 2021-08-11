@@ -31,11 +31,11 @@ var verifyCmd = &cobra.Command{
 	Short: "Verifies input audio metadata and returns the associated relase(s) info if a match was found",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		chromaMngr := &fp.ChromaIO{}
+		chromaPrint := fp.ChromaPrint{}
 		acClient := clients.NewAcoustID(apikey)
 		mbClient := clients.NewMusicBrainz(appName, semVer, contactEmail)
 
-		verifier := vf.NewAudioVerifier(chromaMngr, acClient, mbClient)
+		verifier := vf.NewAudioVerifier(chromaPrint, acClient, mbClient)
 		res, err := verifier.Analyze(audioPath)
 		if err != nil {
 			panic(err)
