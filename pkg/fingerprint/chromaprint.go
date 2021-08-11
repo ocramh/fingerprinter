@@ -84,10 +84,8 @@ func scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 		}
 	}()
 
-	go func() {
-		wg.Wait()
-		close(fChan)
-	}()
+	wg.Wait()
+	close(fChan)
 
 	return fings, nil
 }
