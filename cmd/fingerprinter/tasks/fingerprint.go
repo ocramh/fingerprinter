@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"log"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 
@@ -22,7 +23,7 @@ var fpCmd = &cobra.Command{
 	Use:   "fpcalc",
 	Short: "Calculates the fingerprint of the input mp3 audio file",
 	Run: func(cmd *cobra.Command, args []string) {
-		chroma := fp.ChromaPrint{}
+		chroma := fp.NewChromaPrint(exec.Command)
 		fingerprints, err := chroma.CalcFingerprint(inputFile)
 		if err != nil {
 			log.Fatal(err)

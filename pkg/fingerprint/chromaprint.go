@@ -1,8 +1,10 @@
 package fingerprint
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -15,10 +17,20 @@ var (
 	ValidAudioFormats = []string{".mp3"}
 )
 
+type ExecCmd = func(name string, arg ...string) *exec.Cmd
+
 // ChromaPrint is a concrete implementation of the Fingerprinter interface.
 // It manages IO operations using the chromaprint library, which must be installed
 // as external dependency
-type ChromaPrint struct{}
+type ChromaPrint struct {
+	execCmd ExecCmd
+}
+
+func NewChromaPrint(exec ExecCmd) *ChromaPrint {
+	return &ChromaPrint{
+		execCmd: exec,
+	}
+}
 
 // CalcFingerprint returns the audio Fingerprint of the file at fPath.
 // fPath can be a path to a directory or to a single file
@@ -33,10 +45,10 @@ func (c ChromaPrint) CalcFingerprint(fPath string) ([]*Fingerprint, error) {
 	}
 
 	if fInfo.IsDir() {
-		return scanAudioDir(fPath)
+		return c.scanAudioDir(fPath)
 	}
 
-	return fingerprintFromFile(fInfo, fPath)
+	return c.fingerprintFromFile(fInfo, fPath)
 }
 
 // result is the product of reading a file and extracting its adio fingerprint
@@ -46,8 +58,9 @@ type result struct {
 	err    error
 }
 
-// scanAudioDir scans the directory at dirPath and concurrently extracts fingerprints
-func scanAudioDir(dirPath string) ([]*Fingerprint, error) {
+// scanAudioDir scans the directory at dirPath and concurrently extracts fingerprints.
+// Subdirectories and files with an invalid extension will be ignored
+func (c ChromaPrint) scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {
 		return nil, err
@@ -67,7 +80,7 @@ func scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 			defer wg.Done()
 
 			fpath := path.Join(dirPath, fInfo.Name())
-			fing, err := execFPcalc(fInfo, fpath)
+			fing, err := c.execFPcalc(fInfo, fpath)
 			fChan <- result{
 				path:   fpath,
 				fprint: fing,
@@ -76,6 +89,7 @@ func scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 		}()
 	}
 
+	// collect results
 	go func() {
 		for result := range fChan {
 			if result.err != nil {
@@ -90,12 +104,12 @@ func scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 	return fings, nil
 }
 
-func fingerprintFromFile(fInfo os.FileInfo, fPath string) ([]*Fingerprint, error) {
+func (c ChromaPrint) fingerprintFromFile(fInfo os.FileInfo, fPath string) ([]*Fingerprint, error) {
 	if !isValidExtension(filepath.Ext(fInfo.Name())) {
 		return nil, ErrInvalidFormat
 	}
 
-	fing, err := execFPcalc(fInfo, fPath)
+	fing, err := c.execFPcalc(fInfo, fPath)
 	if err != nil {
 		return nil, err
 	}
@@ -103,32 +117,26 @@ func fingerprintFromFile(fInfo os.FileInfo, fPath string) ([]*Fingerprint, error
 	return []*Fingerprint{fing}, nil
 }
 
-func execFPcalc(fInfo os.FileInfo, fPath string) (*Fingerprint, error) {
+func (c ChromaPrint) execFPcalc(fInfo os.FileInfo, fPath string) (*Fingerprint, error) {
 	fpcalcExecPath, err := exec.LookPath("fpcalc")
 	if err != nil {
 		return nil, err
 	}
 
-	cmd := exec.Command(fpcalcExecPath, "-json", fPath)
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-
-	if err := cmd.Start(); err != nil {
+	cmd := c.execCmd(fpcalcExecPath, "-json", fPath)
+	buf := new(bytes.Buffer)
+	cmd.Stdout = buf
+	if err := cmd.Run(); err != nil {
 		return nil, err
 	}
 
 	var fp Fingerprint
-	if err := json.NewDecoder(stdout).Decode(&fp); err != nil {
+	if err := json.NewDecoder(buf).Decode(&fp); err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
 	fp.InputFile = fInfo
-
-	if err := cmd.Wait(); err != nil {
-		return nil, err
-	}
 
 	return &fp, nil
 }
