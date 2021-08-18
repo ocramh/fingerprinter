@@ -9,7 +9,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Install fpcalc
-      run: sudo apt-get install libchromaprint-tools
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y libchromaprint-tools
 
     - name: Install Go
       uses: actions/setup-go@v2
