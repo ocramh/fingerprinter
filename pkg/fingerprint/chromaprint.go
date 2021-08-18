@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
 	"sync"
+
+	"github.com/spf13/afero"
 )
 
 var (
@@ -24,23 +24,21 @@ type ExecCmd = func(name string, arg ...string) *exec.Cmd
 // as external dependency
 type ChromaPrint struct {
 	execCmd ExecCmd
+	os      afero.Fs
 }
 
-func NewChromaPrint(exec ExecCmd) *ChromaPrint {
+func NewChromaPrint(exec ExecCmd, os afero.Fs) *ChromaPrint {
 	return &ChromaPrint{
 		execCmd: exec,
+		os:      os,
 	}
 }
 
 // CalcFingerprint returns the audio Fingerprint of the file at fPath.
 // fPath can be a path to a directory or to a single file
-func (c ChromaPrint) CalcFingerprint(fPath string) ([]*Fingerprint, error) {
-	fInfo, err := os.Stat(fPath)
+func (c *ChromaPrint) CalcFingerprint(fPath string) ([]*Fingerprint, error) {
+	fInfo, err := c.fileinfoFromPath(fPath)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return nil, ErrInvalidPath
-		}
-
 		return nil, err
 	}
 
@@ -59,9 +57,10 @@ type result struct {
 }
 
 // scanAudioDir scans the directory at dirPath and concurrently extracts fingerprints.
-// Subdirectories and files with an invalid extension will be ignored
-func (c ChromaPrint) scanAudioDir(dirPath string) ([]*Fingerprint, error) {
-	files, err := ioutil.ReadDir(dirPath)
+// Subdirectories and files with an invalid extension will be ignored.
+// This function only scans the top level directory
+func (c *ChromaPrint) scanAudioDir(dirPath string) ([]*Fingerprint, error) {
+	files, err := afero.ReadDir(c.os, dirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -81,6 +80,7 @@ func (c ChromaPrint) scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 
 			fpath := path.Join(dirPath, fInfo.Name())
 			fing, err := c.execFPcalc(fInfo, fpath)
+
 			fChan <- result{
 				path:   fpath,
 				fprint: fing,
@@ -89,22 +89,24 @@ func (c ChromaPrint) scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 		}(fInfo)
 	}
 
-	// collect results
 	go func() {
-		for result := range fChan {
-			if result.err != nil {
-				fings = append(fings, result.fprint)
-			}
-		}
+		wg.Wait()
+		close(fChan)
 	}()
 
-	wg.Wait()
-	close(fChan)
+	// collect results
+	for result := range fChan {
+		if result.err != nil {
+			return nil, result.err
+		}
+
+		fings = append(fings, result.fprint)
+	}
 
 	return fings, nil
 }
 
-func (c ChromaPrint) fingerprintFromFile(fInfo os.FileInfo, fPath string) ([]*Fingerprint, error) {
+func (c *ChromaPrint) fingerprintFromFile(fInfo os.FileInfo, fPath string) ([]*Fingerprint, error) {
 	if !isValidExtension(filepath.Ext(fInfo.Name())) {
 		return nil, ErrInvalidFormat
 	}
@@ -117,7 +119,7 @@ func (c ChromaPrint) fingerprintFromFile(fInfo os.FileInfo, fPath string) ([]*Fi
 	return []*Fingerprint{fing}, nil
 }
 
-func (c ChromaPrint) execFPcalc(fInfo os.FileInfo, fPath string) (*Fingerprint, error) {
+func (c *ChromaPrint) execFPcalc(fInfo os.FileInfo, fPath string) (*Fingerprint, error) {
 	fpcalcExecPath, err := exec.LookPath("fpcalc")
 	if err != nil {
 		return nil, err
@@ -126,13 +128,13 @@ func (c ChromaPrint) execFPcalc(fInfo os.FileInfo, fPath string) (*Fingerprint, 
 	cmd := c.execCmd(fpcalcExecPath, "-json", fPath)
 	buf := new(bytes.Buffer)
 	cmd.Stdout = buf
-	if err := cmd.Run(); err != nil {
+	err = cmd.Run()
+	if err != nil {
 		return nil, err
 	}
 
 	var fp Fingerprint
 	if err := json.NewDecoder(buf).Decode(&fp); err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -149,4 +151,17 @@ func isValidExtension(ext string) bool {
 	}
 
 	return false
+}
+
+func (c *ChromaPrint) fileinfoFromPath(p string) (os.FileInfo, error) {
+	fInfo, err := c.os.Stat(p)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, ErrInvalidPath
+		}
+
+		return nil, err
+	}
+
+	return fInfo, nil
 }

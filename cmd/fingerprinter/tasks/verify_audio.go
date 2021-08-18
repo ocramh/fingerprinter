@@ -35,7 +35,7 @@ var verifyCmd = &cobra.Command{
 		acClient := clients.NewAcoustID(apikey)
 		mbClient := clients.NewMusicBrainz(appName, semVer, contactEmail)
 
-		verifier := vf.NewAudioVerifier(chromaPrint, acClient, mbClient)
+		verifier := vf.NewAudioVerifier(&chromaPrint, acClient, mbClient)
 		res, err := verifier.Analyze(audioPath)
 		if err != nil {
 			panic(err)

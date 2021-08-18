@@ -20,7 +20,7 @@ install: ## installs the executable
 test: ## runs unit tests
 	@mkdir -p $(COVERAGE_DIR)
 	@echo 'mode: atomic' > $(COVERAGE_DIR)/coverage.out
-	@go test ./... -coverprofile=$(COVERAGE_DIR)/coverage.out
+	@go test ./... -race -coverprofile=$(COVERAGE_DIR)/coverage.out
 	@go tool cover -html=$(COVERAGE_DIR)/coverage.out -o $(COVERAGE_DIR)/coverage.html
 
 .PHONY: docker-run
