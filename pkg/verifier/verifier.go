@@ -16,7 +16,7 @@ type ReleaseGroupID string
 // AudioVerifier is responsible for verifying the metadata integrity of individal
 // audio files or folders
 type AudioVerifier struct {
-	chromaMngr     *fp.ChromaIO
+	fprinter       fp.Fingerprinter
 	acClient       *clients.AcoustID
 	mbClient       *clients.MusicBrainz
 	acoustReleases map[ReleaseGroupID]clients.ReleaseGroup
@@ -29,9 +29,9 @@ type AvailableRecording struct {
 	FilePath string
 }
 
-func NewAudioVerifier(ch *fp.ChromaIO, ac *clients.AcoustID, mb *clients.MusicBrainz) *AudioVerifier {
+func NewAudioVerifier(fp fp.Fingerprinter, ac *clients.AcoustID, mb *clients.MusicBrainz) *AudioVerifier {
 	return &AudioVerifier{
-		chromaMngr:     ch,
+		fprinter:       fp,
 		acClient:       ac,
 		mbClient:       mb,
 		acoustReleases: make(map[ReleaseGroupID]clients.ReleaseGroup),
@@ -39,7 +39,7 @@ func NewAudioVerifier(ch *fp.ChromaIO, ac *clients.AcoustID, mb *clients.MusicBr
 }
 
 func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
-	fingerps, err := a.chromaMngr.CalcFingerprint(inputPath)
+	fingerps, err := a.fprinter.CalcFingerprint(inputPath)
 	if err != nil {
 		return nil, err
 	}

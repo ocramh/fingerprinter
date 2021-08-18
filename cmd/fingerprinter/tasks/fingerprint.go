@@ -2,7 +2,9 @@ package tasks
 
 import (
 	"log"
+	"os/exec"
 
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
@@ -20,9 +22,9 @@ func init() {
 
 var fpCmd = &cobra.Command{
 	Use:   "fpcalc",
-	Short: "Calculates the fingerprint of the input audio file",
+	Short: "Calculates the fingerprint of the input mp3 audio file",
 	Run: func(cmd *cobra.Command, args []string) {
-		chroma := fp.ChromaIO{}
+		chroma := fp.NewChromaPrint(exec.Command, afero.NewOsFs())
 		fingerprints, err := chroma.CalcFingerprint(inputFile)
 		if err != nil {
 			log.Fatal(err)

@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	ErrFileNotExists    = errors.New("file does not exists")
-	ErrInvalidFileInput = errors.New("input is not a valid file")
-	ErrInvalidFormat    = errors.New("file format is not valid")
+	ErrInvalidPath      = errors.New("file does not exists")
+	ErrInvalidFileInput = errors.New("invalid input file")
+	ErrInvalidFormat    = errors.New("invalid file format")
 )
