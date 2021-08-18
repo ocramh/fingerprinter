@@ -76,7 +76,7 @@ func (c ChromaPrint) scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 		}
 
 		wg.Add(1)
-		go func() {
+		go func(fInfo os.FileInfo) {
 			defer wg.Done()
 
 			fpath := path.Join(dirPath, fInfo.Name())
@@ -86,7 +86,7 @@ func (c ChromaPrint) scanAudioDir(dirPath string) ([]*Fingerprint, error) {
 				fprint: fing,
 				err:    err,
 			}
-		}()
+		}(fInfo)
 	}
 
 	// collect results

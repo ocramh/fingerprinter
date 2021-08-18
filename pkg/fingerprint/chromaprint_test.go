@@ -23,7 +23,7 @@ func TestShellProcessSuccess(t *testing.T) {
 	os.Exit(0)
 }
 
-func TestCalcFingerprintFromFile(t *testing.T) {
+func TestFingerprintFromFile(t *testing.T) {
 	mockExec := func(command string, args ...string) *exec.Cmd {
 		cs := []string{"-test.run=TestShellProcessSuccess", "--", command}
 		cs = append(cs, args...)
@@ -46,6 +46,6 @@ func TestCalcFingerprintFromFile(t *testing.T) {
 	})
 }
 
-func TestCalcFingerprintFromDir(t *testing.T) {
+func TestFingerprintFromDir(t *testing.T) {
 	assert.Equal(t, 1, 1)
 }
