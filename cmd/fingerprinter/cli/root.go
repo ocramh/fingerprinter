@@ -1,4 +1,4 @@
-package tasks
+package cli
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ var rootCmd = &cobra.Command{
 	Short: "audio files fingerprinting and metadata fetcher",
 }
 
-func Execute() {
+func RunCLI() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

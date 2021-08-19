@@ -1,7 +1,10 @@
-package tasks
+package cli
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
 
 	"github.com/spf13/afero"
@@ -25,14 +28,17 @@ var fpCmd = &cobra.Command{
 	Short: "Calculates the fingerprint of the input mp3 audio file",
 	Run: func(cmd *cobra.Command, args []string) {
 		chroma := fp.NewChromaPrint(exec.Command, afero.NewOsFs())
+
 		fingerprints, err := chroma.CalcFingerprint(inputFile)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		for _, fingerprint := range fingerprints {
-			log.Printf("[duration] %f\n", fingerprint.Duration)
-			log.Printf("[fingerprint] %s\n", fingerprint.Value)
+		b, err := json.Marshal(fingerprints)
+		if err != nil {
+			log.Fatal(err)
 		}
+
+		fmt.Fprint(os.Stdout, string(b))
 	},
 }
