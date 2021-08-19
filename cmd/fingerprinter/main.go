@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/ocramh/fingerprinter/cmd/fingerprinter/tasks"
+	"github.com/ocramh/fingerprinter/cmd/fingerprinter/cli"
 )
 
 func main() {
-	tasks.Execute()
+	cli.RunCLI()
 }

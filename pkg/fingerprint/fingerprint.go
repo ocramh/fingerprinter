@@ -12,7 +12,7 @@ type Fingerprinter interface {
 // Fingerprint is an audio file fingerprint. The JSON structure allows the struct to
 // parse the chromaprint fpcalc command when executed with the -json flag
 type Fingerprint struct {
-	Duration  float32 `json:"duration"`
-	Value     string  `json:"fingerprint"`
-	InputFile os.FileInfo
+	Duration  float32     `json:"duration"`
+	Value     string      `json:"fingerprint"`
+	InputFile os.FileInfo `json:"-"`
 }

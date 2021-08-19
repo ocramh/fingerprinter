@@ -1,7 +1,10 @@
-package tasks
+package cli
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/spf13/cobra"
 
@@ -34,16 +37,11 @@ var mbCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		log.Printf("[recording title]: %s \n", recInfo.Title)
-
-		for _, md := range recInfo.Media {
-			for _, tr := range md.Tracks {
-				log.Printf("[recording id]: %s \n", tr.Recording.ID)
-				log.Printf("[track title]: %s \n", tr.Title)
-				log.Printf("[track id]: %s \n", tr.ID)
-				log.Printf("[track position]: %d \n", tr.Position)
-				log.Printf("[track isrc]: %v \n", tr.Recording.ISRCs)
-			}
+		b, err := json.Marshal(recInfo)
+		if err != nil {
+			log.Fatal(err)
 		}
+
+		fmt.Fprint(os.Stdout, string(b))
 	},
 }
