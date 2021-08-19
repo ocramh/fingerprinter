@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 
-	"github.com/ocramh/fingerprinter/pkg/clients"
+	ac "github.com/ocramh/fingerprinter/pkg/acoustid"
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
 )
 
@@ -37,10 +37,10 @@ var acoustidCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		acoustIDClient := clients.NewAcoustID(apikey)
+		acoustIDClient := ac.NewAcoustID(apikey)
 		retryOnFail := true
 
-		var lookupRes []clients.ACLookupResult
+		var lookupRes []ac.ACLookupResult
 		for _, fingerprint := range fingerprints {
 			resp, err := acoustIDClient.LookupFingerprint(fingerprint, retryOnFail)
 			if err != nil {
@@ -49,7 +49,7 @@ var acoustidCmd = &cobra.Command{
 
 			lookupRes = append(lookupRes, resp.Results...)
 
-			time.Sleep(clients.AcoustIDReqDelay)
+			time.Sleep(ac.AcoustIDReqDelay)
 		}
 
 		b, err := json.Marshal(lookupRes)

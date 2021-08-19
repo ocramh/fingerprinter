@@ -5,8 +5,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	clients "github.com/ocramh/fingerprinter/pkg/clients"
+	ac "github.com/ocramh/fingerprinter/pkg/acoustid"
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
+	mb "github.com/ocramh/fingerprinter/pkg/musicbrainz"
 	vf "github.com/ocramh/fingerprinter/pkg/verifier"
 )
 
@@ -32,8 +33,8 @@ var verifyCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		chromaPrint := fp.ChromaPrint{}
-		acClient := clients.NewAcoustID(apikey)
-		mbClient := clients.NewMusicBrainz(appName, semVer, contactEmail)
+		acClient := ac.NewAcoustID(apikey)
+		mbClient := mb.NewMusicBrainz(appName, semVer, contactEmail)
 
 		verifier := vf.NewAudioVerifier(&chromaPrint, acClient, mbClient)
 		res, err := verifier.Analyze(audioPath)

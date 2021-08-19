@@ -1,4 +1,4 @@
-package musicbrainz
+package types
 
 // RecordingInfo is a recording info response returned by the MusciBrainz API
 type RecordingInfo struct {

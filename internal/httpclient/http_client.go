@@ -1,4 +1,4 @@
-package clients
+package httpclient
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ const (
 	ReqTimeout = 60 * time.Second
 )
 
-func newHTTPClient() *http.Client {
+func NewClient() *http.Client {
 	return &http.Client{
 		Timeout: ReqTimeout,
 	}

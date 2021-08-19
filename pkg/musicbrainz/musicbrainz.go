@@ -1,4 +1,4 @@
-package clients
+package musicbrainz
 
 import (
 	"encoding/json"
@@ -8,7 +8,8 @@ import (
 	"strings"
 	"time"
 
-	mb "github.com/ocramh/fingerprinter/pkg/clients/musicbrainz"
+	hc "github.com/ocramh/fingerprinter/internal/httpclient"
+	mb "github.com/ocramh/fingerprinter/pkg/musicbrainz/types"
 )
 
 const (
@@ -54,7 +55,7 @@ func (m *MusicBrainz) GetRecordingInfo(recordingID string) (*mb.RecordingInfo, e
 	}
 	req.Header.Add("Content-Type", "application/json")
 
-	httpClient := newHTTPClient()
+	httpClient := hc.NewClient()
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -83,7 +84,7 @@ func (m *MusicBrainz) GetReleaseInfo(releaseID string) (*mb.ReleaseInfo, error) 
 	}
 	req.Header.Add("Content-Type", "application/json")
 
-	httpClient := newHTTPClient()
+	httpClient := hc.NewClient()
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -110,10 +111,7 @@ func (m *MusicBrainz) handleMBErrResp(r *http.Response) error {
 		return err
 	}
 
-	return HTTPError{
-		code:    r.StatusCode,
-		message: errResp.Error,
-	}
+	return hc.NewHTTPError(r.StatusCode, errResp.Error)
 }
 
 // newMBGETRequest builds a new MusicBrainz HTTP GET request.

@@ -6,7 +6,7 @@ import (
 
 // Release represents a real-world release objects (like a physical album) that can
 // be bought in a music store.
-// It is defined  according to https://musicbrainz.org/doc/Release
+// Its data model is defined according to https://musicbrainz.org/doc/Release
 type Release struct {
 	ID           string
 	Title        string

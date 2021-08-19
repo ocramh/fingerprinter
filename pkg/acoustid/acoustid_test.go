@@ -1,4 +1,4 @@
-package clients
+package acoustid
 
 import (
 	"io/ioutil"
@@ -6,8 +6,10 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
-	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
 	"github.com/stretchr/testify/assert"
+
+	hc "github.com/ocramh/fingerprinter/internal/httpclient"
+	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
 )
 
 func TestLookupFingerprintOK(t *testing.T) {
@@ -82,9 +84,9 @@ func TestLookupFingerprintStatusNotOK(t *testing.T) {
 		Value:    "the-extracted-fingerprint",
 	}
 	_, err = acClient.LookupFingerprint(&fingerprint, false)
-	assert.Equal(t, HTTPError{
-		code:    http.StatusBadRequest,
-		message: "invalid fingerprint",
+	assert.Equal(t, hc.HTTPError{
+		Code:    http.StatusBadRequest,
+		Message: "invalid fingerprint",
 	}, err)
 }
 
@@ -105,9 +107,9 @@ func TestLookupFingerprintStatusServiceUnavailable(t *testing.T) {
 		Value:    "the-extracted-fingerprint",
 	}
 	_, err := acClient.LookupFingerprint(&fingerprint, true)
-	assert.Equal(t, HTTPError{
-		code:    http.StatusServiceUnavailable,
-		message: "upstream service not available",
+	assert.Equal(t, hc.HTTPError{
+		Code:    http.StatusServiceUnavailable,
+		Message: "upstream service not available",
 	}, err)
 	assert.Equal(t, 2, httpmock.GetTotalCallCount())
 }

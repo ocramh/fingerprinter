@@ -1,4 +1,4 @@
-package musicbrainz
+package types
 
 // ReleaseInfo is a release info response type returned by the MusicBrainz API
 type ReleaseInfo struct {

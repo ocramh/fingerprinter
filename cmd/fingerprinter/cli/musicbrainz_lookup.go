@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ocramh/fingerprinter/pkg/clients"
+	mb "github.com/ocramh/fingerprinter/pkg/musicbrainz"
 )
 
 var (
@@ -31,7 +31,7 @@ var mbCmd = &cobra.Command{
 	Use:   "mblookup",
 	Short: "Queries the MusicBrainz API and returns recordings and releases metadata associated with a recording ID",
 	Run: func(cmd *cobra.Command, args []string) {
-		mbClient := clients.NewMusicBrainz(appName, semVer, contactEmail)
+		mbClient := mb.NewMusicBrainz(appName, semVer, contactEmail)
 		recInfo, err := mbClient.GetReleaseInfo(releaseID)
 		if err != nil {
 			log.Fatal(err)

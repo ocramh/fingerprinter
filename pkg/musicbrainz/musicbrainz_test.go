@@ -1,4 +1,4 @@
-package clients
+package musicbrainz
 
 import (
 	"fmt"
@@ -10,6 +10,8 @@ import (
 
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+
+	hc "github.com/ocramh/fingerprinter/internal/httpclient"
 )
 
 var (
@@ -82,9 +84,9 @@ func TestGetRecordingInfoNotFound(t *testing.T) {
 	client := NewMusicBrainz(testAppName, testAppVersion, testEmail)
 
 	_, err = client.GetRecordingInfo(recordingID)
-	assert.Equal(t, HTTPError{
-		code:    http.StatusNotFound,
-		message: "Not Found",
+	assert.Equal(t, hc.HTTPError{
+		Code:    http.StatusNotFound,
+		Message: "Not Found",
 	}, err)
 }
 
@@ -142,8 +144,8 @@ func TestGetReleaseInfoNotFound(t *testing.T) {
 	client := NewMusicBrainz(testAppName, testAppVersion, testEmail)
 
 	_, err = client.GetReleaseInfo(recordingID)
-	assert.Equal(t, HTTPError{
-		code:    http.StatusNotFound,
-		message: "Not Found",
+	assert.Equal(t, hc.HTTPError{
+		Code:    http.StatusNotFound,
+		Message: "Not Found",
 	}, err)
 }
