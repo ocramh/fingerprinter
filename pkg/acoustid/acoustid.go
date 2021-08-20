@@ -1,4 +1,4 @@
-package clients
+package acoustid
 
 import (
 	"bytes"
@@ -10,11 +10,12 @@ import (
 	"strings"
 	"time"
 
+	hc "github.com/ocramh/fingerprinter/internal/httpclient"
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
 )
 
 const (
-	// AcoustIDBaseURL is the base URL used for POSTing queries
+	// AcoustIDBaseURL is the base URL used for queries the acoustid API
 	AcoustIDBaseURL = "https://api.acoustid.org/v2/lookup"
 
 	// The delay requests should respect when being fired in succession
@@ -39,8 +40,8 @@ func NewAcoustID(k string) *AcoustID {
 	return &AcoustID{k}
 }
 
-// LookupFingerprint uses audio fingerprints and duration values to search the AcoustID
-// fingerprint database and return the corresponding track ID and MusicBrainz
+// LookupFingerprint uses audio fingerprints and duration values to search the
+// AcoustID fingerprint database and return the corresponding track ID and MusicBrainz
 // recording ID if a match was found
 func (a *AcoustID) LookupFingerprint(f *fp.Fingerprint, withRetry bool) (*AcoustIDLookupResp, error) {
 	resp, err := a.doHTTPRequest((f))
@@ -61,10 +62,7 @@ func (a *AcoustID) LookupFingerprint(f *fp.Fingerprint, withRetry bool) (*Acoust
 				return a.LookupFingerprint(f, false)
 			}
 
-			return nil, HTTPError{
-				code:    http.StatusServiceUnavailable,
-				message: "upstream service not available",
-			}
+			return nil, hc.NewHTTPError(http.StatusServiceUnavailable, "upstream service not available")
 		}
 		return nil, handleAcoustIDErrResp(resp)
 	}
@@ -87,7 +85,6 @@ func retryAfterSec(r *http.Response) time.Duration {
 	}
 
 	return time.Duration(retryAfterSec) * time.Second
-
 }
 
 func (a *AcoustID) buildLookupQueryVals(f *fp.Fingerprint) url.Values {
@@ -108,7 +105,7 @@ func (a *AcoustID) doHTTPRequest(f *fp.Fingerprint) (*http.Response, error) {
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	httpClient := newHTTPClient()
+	httpClient := hc.NewClient()
 
 	return httpClient.Do(req)
 }
@@ -120,53 +117,7 @@ func handleAcoustIDErrResp(resp *http.Response) error {
 		return err
 	}
 
-	return HTTPError{
-		code:    resp.StatusCode,
-		message: errResp.Error.Message,
-	}
-}
-
-// AcoustIDLookupResp is the type used to parse a successfull AcoustID JSON response
-type AcoustIDLookupResp struct {
-	Status  string           `json:"status"`
-	Results []ACLookupResult `json:"results"`
-}
-
-// ACLookupResult is a fingerprint match. It contaons one or more recordings that
-// include the audio fingerprint analized and the accuracy score
-type ACLookupResult struct {
-	ID         string      `json:"id"`
-	Score      float32     `json:"score"`
-	Recordings []Recording `json:"recordings"`
-}
-
-// Recording is a single recording as defined by the MusicBrainz catalogue
-type Recording struct {
-	MBRecordingID   string         `json:"id"`
-	MBReleaseGroups []ReleaseGroup `json:"releasegroups"`
-}
-
-// ReleaseGroup is a logical group of releases
-type ReleaseGroup struct {
-	ID       string    `json:"id"`
-	Title    string    `json:"title"`
-	Type     string    `json:"type"`
-	Releases []Release `json:"releases"`
-}
-
-// Release identifies a unique release on the MusicBrainz catalogue
-type Release struct {
-	ID string `json:"id"`
-}
-
-// AcoustErrResp is the type used to parse an AcoustID error JSON response
-type AcoustErrResp struct {
-	Error acoustIDErr `json:"error"`
-}
-
-type acoustIDErr struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+	return hc.NewHTTPError(resp.StatusCode, errResp.Error.Message)
 }
 
 // ACResultsByScore is the ACLookupResult implementation of the sort.Interface

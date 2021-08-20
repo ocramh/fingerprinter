@@ -1,4 +1,4 @@
-package musicbrainz
+package types
 
 import (
 	"encoding/json"

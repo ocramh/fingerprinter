@@ -6,9 +6,10 @@ import (
 	"sort"
 	"time"
 
-	clients "github.com/ocramh/fingerprinter/pkg/clients"
-	mb_types "github.com/ocramh/fingerprinter/pkg/clients/musicbrainz"
+	ac "github.com/ocramh/fingerprinter/pkg/acoustid"
 	fp "github.com/ocramh/fingerprinter/pkg/fingerprint"
+	mb "github.com/ocramh/fingerprinter/pkg/musicbrainz"
+	mb_types "github.com/ocramh/fingerprinter/pkg/musicbrainz/types"
 )
 
 type ReleaseGroupID string
@@ -17,9 +18,9 @@ type ReleaseGroupID string
 // audio files or folders
 type AudioVerifier struct {
 	fprinter       fp.Fingerprinter
-	acClient       *clients.AcoustID
-	mbClient       *clients.MusicBrainz
-	acoustReleases map[ReleaseGroupID]clients.ReleaseGroup
+	acClient       *ac.AcoustID
+	mbClient       *mb.MusicBrainz
+	acoustReleases map[ReleaseGroupID]ac.ReleaseGroup
 }
 
 // AvailableRecording contains the uploaded file path and its associated musicbrainz
@@ -29,12 +30,12 @@ type AvailableRecording struct {
 	FilePath string
 }
 
-func NewAudioVerifier(fp fp.Fingerprinter, ac *clients.AcoustID, mb *clients.MusicBrainz) *AudioVerifier {
+func NewAudioVerifier(fp fp.Fingerprinter, acID *ac.AcoustID, mb *mb.MusicBrainz) *AudioVerifier {
 	return &AudioVerifier{
 		fprinter:       fp,
-		acClient:       ac,
+		acClient:       acID,
 		mbClient:       mb,
-		acoustReleases: make(map[ReleaseGroupID]clients.ReleaseGroup),
+		acoustReleases: make(map[ReleaseGroupID]ac.ReleaseGroup),
 	}
 }
 
@@ -65,7 +66,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 			continue
 		}
 
-		sort.Sort(clients.ACResultsByScore(acLookup.Results))
+		sort.Sort(ac.ACResultsByScore(acLookup.Results))
 		topAcMatch := acLookup.Results[0]
 
 		if len(topAcMatch.Recordings) == 0 {
@@ -149,7 +150,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 				}
 			}
 
-			time.Sleep(clients.MusicBrainzReqDelay)
+			time.Sleep(mb.MusicBrainzReqDelay)
 		}
 
 		analysis.MatchedReleases = append(analysis.MatchedReleases, releaseData)
@@ -161,7 +162,7 @@ func (a AudioVerifier) Analyze(inputPath string) (ra *RecAnalysis, err error) {
 
 // adds new releases IDs to the existing ReleaseGroup if they
 // if they are not already included
-func addMissingReleasesIDToGroup(new *clients.ReleaseGroup, existing *clients.ReleaseGroup) *clients.ReleaseGroup {
+func addMissingReleasesIDToGroup(new *ac.ReleaseGroup, existing *ac.ReleaseGroup) *ac.ReleaseGroup {
 	for _, rg1 := range new.Releases {
 
 		var releaseAlreadyExists bool

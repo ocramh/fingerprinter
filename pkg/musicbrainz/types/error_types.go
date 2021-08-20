@@ -1,4 +1,4 @@
-package musicbrainz
+package types
 
 // MBError is a MusicBrainz API error response type
 type MBError struct {

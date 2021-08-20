@@ -1,4 +1,4 @@
-package clients
+package httpclient
 
 import (
 	"errors"
@@ -11,18 +11,18 @@ var (
 
 // HTTPError is the Error interface implementation used for HTTP errors
 type HTTPError struct {
-	code    int
-	message string
+	Code    int
+	Message string
 }
 
 // NewHTTPError returns a new HTTPError instance
 func NewHTTPError(statusCode int, message string) HTTPError {
 	return HTTPError{
-		code:    statusCode,
-		message: message,
+		Code:    statusCode,
+		Message: message,
 	}
 }
 
 func (h HTTPError) Error() string {
-	return fmt.Sprintf("http status: %d. error message: %s", h.code, h.message)
+	return fmt.Sprintf("http status: %d. error message: %s", h.Code, h.Message)
 }
