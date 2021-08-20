@@ -2,7 +2,9 @@ package cli
 
 import (
 	"fmt"
+	"os/exec"
 
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 
 	ac "github.com/ocramh/fingerprinter/pkg/acoustid"
@@ -32,11 +34,11 @@ var verifyCmd = &cobra.Command{
 	Short: "Verifies input audio metadata and returns the associated relase(s) info if a match was found",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		chromaPrint := fp.ChromaPrint{}
+		chPrint := fp.NewChromaPrint(exec.Command, afero.NewOsFs())
 		acClient := ac.NewAcoustID(apikey)
 		mbClient := mb.NewMusicBrainz(appName, semVer, contactEmail)
 
-		verifier := vf.NewAudioVerifier(&chromaPrint, acClient, mbClient)
+		verifier := vf.NewAudioVerifier(chPrint, acClient, mbClient)
 		res, err := verifier.Analyze(audioPath)
 		if err != nil {
 			panic(err)
