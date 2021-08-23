@@ -27,7 +27,6 @@ RUN mkdir chromaprint && \
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=ON . && \
     make && make install
 
-# run fpcalc <input.mp3> -json to generate fingerprint
 WORKDIR /app/fingerprinter
 COPY . .
 RUN make install

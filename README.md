@@ -41,4 +41,3 @@ Flags:
 
 ## Docker
 The Dockerfile can be used to build and run the application and automatically takes care of installing all the required dependencies.
-Since teh dockerfile mounts the application directory it is possible to add a folder with audio files so that they can be used from inside the container for testing purposes.

@@ -14,7 +14,7 @@ import (
 
 type ReleaseGroupID string
 
-// AudioVerifier is responsible for verifying the metadata integrity of individal
+// AudioVerifier is responsible for verifying the metadata integrity of individual
 // audio files or folders
 type AudioVerifier struct {
 	fprinter       fp.Fingerprinter
